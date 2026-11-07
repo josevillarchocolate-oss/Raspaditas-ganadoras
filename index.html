@@ -3,187 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plataforma de Raspaditas Online</title>
+<title>Raspaditas Online</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
-body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
-.gold-text{color:#fbbf24;text-shadow:0 0 10px rgba(251,191,36,0.4)}
-.scratch-card{transition:transform .2s,box-shadow .2s}
-.scratch-card:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(139,92,246,.3)}
+body{font-family:sans-serif;background:#0f0c1b;color:#fff}
+.gold{color:#fbbf24}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-.shimmer-bg{background:linear-gradient(90deg,#2d264d 25%,#4c3e7a 50%,#2d264d 75%);background-size:200% 100%;animation:shimmer 2.5s infinite linear}
-@keyframes pulse-gold{0%,100%{transform:scale(1);box-shadow:0 0 10px #fbbf24}50%{transform:scale(1.15);box-shadow:0 0 25px #fbbf24,0 0 40px #f59e0b}}
-.winner-pulse{animation:pulse-gold 1s infinite;border:3px solid #fbbf24!important;background-color:rgba(251,191,36,.2)!important;z-index:10}
+.shimmer{background:linear-gradient(90deg,#2d264d 25%,#4c3e7a 50%,#2d264d 75%);background-size:200% 100%;animation:shimmer 2.5s infinite linear}
+.winner{border:3px solid #fbbf24!important;background:rgba(251,191,36,.2)!important}
 </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
-<div id="loading-msg" style="text-align:center;padding:40px;color:white;">Cargando raspaditas...</div>
-<main class="flex-grow flex items-center justify-center p-4 w-full max-w-6xl mx-auto">
-<div id="admin-view" class="w-full bg-slate-900/80 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-slate-800 shadow-2xl hidden">
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 mb-6 gap-4">
-<div><h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">🎰 <span class="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-purple-400">Panel de Control de Raspaditas</span></h1><p class="text-slate-400 text-sm mt-1">Genera y administra los accesos únicos para los jugadores.</p></div>
-<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Bloqueo Global Activo - Firebase</span>
+<body class="min-h-screen">
+<main class="flex items-center justify-center p-4 max-w-6xl mx-auto">
+<div id="admin-view" class="w-full bg-slate-900 rounded-2xl p-6 border border-slate-800 hidden">
+<h1 class="text-2xl font-black">🎰 Panel de Control de Raspaditas</h1>
+<p class="text-slate-400 text-sm">Bloqueo Global Activo - Firebase sin SDK</p>
+<div class="grid grid-cols-2 gap-4 my-5">
+<div class="bg-black p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Total Cartones</p><p id="stat-total" class="text-3xl font-black">0</p></div>
+<div class="bg-black p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Total Premiado</p><p id="stat-total-premiado" class="text-3xl font-black text-amber-400">0 Gs</p><p id="stat-premiado-count" class="text-xs text-slate-400">0 con premio</p></div>
 </div>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-<div class="bg-slate-950 p-5 rounded-xl border border-slate-800/60 text-center"><p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total de Cartones Generados</p><p id="stat-total" class="text-4xl font-black text-white mt-1">0</p><p class="text-[11px] text-slate-500 mt-1">Enlaces creados en total</p></div>
-<div class="bg-slate-950 p-5 rounded-xl border border-amber-500/20 text-center"><p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Premiado</p><p id="stat-total-premiado" class="text-4xl font-black text-amber-400 mt-1">0 Gs</p><p id="stat-premiado-count" class="text-[11px] text-slate-400 mt-1">0 cartones con premio</p></div>
+<div class="grid lg:grid-cols-3 gap-6">
+<div class="bg-black/50 p-4 rounded-xl h-fit">
+<h2 class="font-bold mb-3">🛠️ Configurar Enlace</h2>
+<div class="grid grid-cols-2 gap-2 mb-3">
+<button id="btn-type-prize" onclick="setPrizeType(true)" class="py-2 rounded-lg bg-amber-500/20 border border-amber-500 text-amber-300 text-sm font-bold">🎁 Con Premio</button>
+<button id="btn-type-noprize" onclick="setPrizeType(false)" class="py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 text-sm font-bold">❌ Sin Premio</button>
 </div>
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-<div class="bg-slate-950/50 p-5 rounded-xl border border-slate-800/80 h-fit">
-<h2 class="text-lg font-bold text-white mb-4">🛠️ Configurar Enlace</h2>
-<div class="space-y-4">
-<div><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Enlace</label>
-<div class="grid grid-cols-2 gap-2">
-<button type="button" id="btn-type-prize" onclick="setPrizeType(true)" class="py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-amber-500/20 border-amber-500 text-amber-300">🎁 Con Premio</button>
-<button type="button" id="btn-type-noprize" onclick="setPrizeType(false)" class="py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-slate-900 border-slate-700 text-slate-400">❌ Sin Premio</button>
-</div></div>
-<div id="wrapper-prize-amount"><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Monto del Premio</label>
-<select id="prize-amount" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white font-bold"><option value="5.000">5.000 Gs</option><option value="10.000" selected>10.000 Gs</option><option value="20.000">20.000 Gs</option><option value="50.000">50.000 Gs</option><option value="100.000">100.000 Gs</option><option value="500.000">500.000 Gs</option><option value="1.000.000">1.000.000 Gs</option><option value="3.000.000">3.000.000 Gs</option><option value="5.000.000">5.000.000 Gs</option></select></div>
-<div><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Cantidad de Raspaditas (Max 10)</label>
-<div class="flex items-center gap-3"><input type="range" id="card-quantity" min="1" max="10" value="1" oninput="updateQtyLabel(this.value)" class="w-full accent-purple-500"><span id="qty-label" class="bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 px-3 py-1 rounded-md text-sm min-w-[36px] text-center">1</span></div>
-<p class="text-[11px] text-slate-500 mt-1">El jugador raspará esta cantidad de cartones secuencialmente.</p></div>
-<button onclick="generateScratchLink()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-lg">🚀 Crear Enlace Único</button>
-</div></div>
-<div class="lg:col-span-2 flex flex-col"><h2 class="text-lg font-bold text-white mb-4">🔗 Enlaces Activos Creados</h2>
-<div class="flex-grow overflow-x-auto bg-slate-950/30 border border-slate-800/80 rounded-xl max-h-[380px] overflow-y-auto">
-<table class="w-full text-left"><thead><tr class="bg-slate-950 text-slate-400 uppercase text-[10px] border-b border-slate-800"><th class="p-3">ID / Configuración</th><th class="p-3">Destino / Enlace</th><th class="p-3 text-center">Estado</th><th class="p-3 text-right">Acción</th></tr></thead>
-<tbody id="links-table-body" class="text-xs divide-y divide-slate-800/60"></tbody></table>
-<div id="no-links-msg" class="text-center py-12 text-slate-500 hidden">No has generado ningún enlace todavía.</div>
-</div></div>
-</div></div>
-<div id="error-view" class="w-full max-w-md bg-slate-900/90 border border-red-500/30 rounded-2xl p-8 text-center hidden"><div class="text-3xl mb-4">⚠️</div><h2 class="text-2xl font-bold text-white mb-2">Enlace no válido</h2><p id="error-message-text" class="text-slate-400 text-sm">Este token ya fue utilizado.</p></div>
-<div id="player-select-view" class="w-full max-w-2xl bg-slate-900/80 rounded-2xl p-6 border border-slate-800 text-center hidden">
-<span id="player-badge-qty" class="bg-purple-500/20 text-purple-300 text-xs font-bold px-3 py-1 rounded-full border border-purple-500/30">Cargando...</span>
-<h2 class="text-2xl md:text-3xl font-extrabold text-white mt-3">¡Elige tu Cartón de la Suerte!</h2>
-<p class="text-slate-400 text-sm mt-1">Selecciona uno de los 9 cartones para empezar.</p>
-<div class="grid grid-cols-3 gap-3 max-w-md mx-auto aspect-square mb-6 mt-4">
-<button onclick="selectCarton(0)" id="carton-0" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦊<span class="text-xs block opacity-60">#1</span></button>
-<button onclick="selectCarton(1)" id="carton-1" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦁<span class="text-xs block opacity-60">#2</span></button>
-<button onclick="selectCarton(2)" id="carton-2" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🐼<span class="text-xs block opacity-60">#3</span></button>
-<button onclick="selectCarton(3)" id="carton-3" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦊<span class="text-xs block opacity-60">#4</span></button>
-<button onclick="selectCarton(4)" id="carton-4" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦁<span class="text-xs block opacity-60">#5</span></button>
-<button onclick="selectCarton(5)" id="carton-5" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🐼<span class="text-xs block opacity-60">#6</span></button>
-<button onclick="selectCarton(6)" id="carton-6" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦊<span class="text-xs block opacity-60">#7</span></button>
-<button onclick="selectCarton(7)" id="carton-7" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦁<span class="text-xs block opacity-60">#8</span></button>
-<button onclick="selectCarton(8)" id="carton-8" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🐼<span class="text-xs block opacity-60">#9</span></button>
+<div id="wrapper-prize-amount" class="mb-3"><label class="text-xs text-slate-400">Monto</label><select id="prize-amount" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-bold"><option value="5.000">5.000 Gs</option><option value="10.000" selected>10.000 Gs</option><option value="20.000">20.000 Gs</option><option value="50.000">50.000 Gs</option><option value="100.000">100.000 Gs</option><option value="500.000">500.000 Gs</option><option value="1.000.000">1.000.000 Gs</option><option value="3.000.000">3.000.000 Gs</option><option value="5.000.000">5.000.000 Gs</option></select></div>
+<div class="mb-3"><label class="text-xs text-slate-400">Cantidad (Max 10)</label><div class="flex gap-3 items-center"><input type="range" id="card-quantity" min="1" max="10" value="1" oninput="document.getElementById('qty-label').textContent=this.value" class="w-full"><span id="qty-label" class="bg-purple-500/20 px-3 py-1 rounded">1</span></div></div>
+<button onclick="generateScratchLink()" class="w-full bg-purple-600 font-bold py-3 rounded-lg">🚀 Crear Enlace Único</button>
 </div>
-<button id="btn-confirm-select" disabled onclick="goToScratchPhase()" class="w-full max-w-xs bg-slate-800 text-slate-500 font-bold py-3 rounded-xl">Selecciona un cartón</button>
+<div class="lg:col-span-2"><h2 class="font-bold mb-3">🔗 Enlaces Creados</h2><div id="links-table-body" class="space-y-2"></div><div id="no-links-msg" class="text-center py-8 text-slate-500">No has generado ningún enlace todavía.</div></div>
 </div>
-<div id="player-scratch-view" class="w-full max-w-md bg-slate-900/90 rounded-2xl p-6 border border-slate-800 text-center hidden">
-<div class="flex justify-between items-center mb-4 text-xs font-semibold text-slate-400"><span id="scratch-current-status">Raspadita 1 de 1</span><span id="scratch-percent-display" class="bg-slate-800 px-2.5 py-1 rounded-md text-purple-400">Raspado: 0%</span></div>
-<div class="relative w-full aspect-square bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 touch-none"><div id="symbols-grid" class="absolute inset-0 grid grid-cols-3 grid-rows-3 p-3 gap-2"></div><canvas id="scratch-canvas" class="absolute inset-0 w-full h-full cursor-crosshair z-20"></canvas></div>
-<p class="text-xs text-slate-400 mt-4 animate-pulse">Usa tu dedo para raspar. Al 50% se revela todo.</p>
-<div id="next-action-wrapper" class="mt-5 hidden"><button id="btn-next-card" onclick="advanceNextCardOrFinish()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl">Siguiente</button></div>
 </div>
-<div id="blocked-view" class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-2xl p-8 text-center hidden">
+<div id="error-view" class="w-full max-w-md bg-slate-900 rounded-2xl p-8 text-center hidden"><h2 class="text-xl font-bold">Enlace no válido</h2></div>
+<div id="player-select-view" class="w-full max-w-2xl bg-slate-900 rounded-2xl p-6 text-center hidden">
+<span id="player-badge-qty" class="bg-purple-500/20 text-purple-300 text-xs font-bold px-3 py-1 rounded-full">Cargando...</span>
+<h2 class="text-2xl font-black mt-3">¡Elige tu Cartón de la Suerte!</h2>
+<div class="grid grid-cols-3 gap-3 max-w-md mx-auto aspect-square my-5">
+<button onclick="selectCarton(0)" id="carton-0" class="shimmer rounded-xl border-2 border-slate-700">🦊<span class="block text-xs">#1</span></button>
+<button onclick="selectCarton(1)" id="carton-1" class="shimmer rounded-xl border-2 border-slate-700">🦁<span class="block text-xs">#2</span></button>
+<button onclick="selectCarton(2)" id="carton-2" class="shimmer rounded-xl border-2 border-slate-700">🐼<span class="block text-xs">#3</span></button>
+<button onclick="selectCarton(3)" id="carton-3" class="shimmer rounded-xl border-2 border-slate-700">🦊<span class="block text-xs">#4</span></button>
+<button onclick="selectCarton(4)" id="carton-4" class="shimmer rounded-xl border-2 border-slate-700">🦁<span class="block text-xs">#5</span></button>
+<button onclick="selectCarton(5)" id="carton-5" class="shimmer rounded-xl border-2 border-slate-700">🐼<span class="block text-xs">#6</span></button>
+<button onclick="selectCarton(6)" id="carton-6" class="shimmer rounded-xl border-2 border-slate-700">🦊<span class="block text-xs">#7</span></button>
+<button onclick="selectCarton(7)" id="carton-7" class="shimmer rounded-xl border-2 border-slate-700">🦁<span class="block text-xs">#8</span></button>
+<button onclick="selectCarton(8)" id="carton-8" class="shimmer rounded-xl border-2 border-slate-700">🐼<span class="block text-xs">#9</span></button>
+</div>
+<button id="btn-confirm-select" disabled onclick="goToScratchPhase()" class="w-full max-w-xs bg-slate-800 py-3 rounded-xl font-bold">Selecciona un cartón</button>
+</div>
+<div id="player-scratch-view" class="w-full max-w-md bg-slate-900 rounded-2xl p-6 text-center hidden">
+<div class="flex justify-between text-xs mb-4"><span id="scratch-current-status">Raspadita 1 de 1</span><span id="scratch-percent-display">Raspado: 0%</span></div>
+<div class="relative w-full aspect-square bg-black rounded-xl overflow-hidden"><div id="symbols-grid" class="absolute inset-0 grid grid-cols-3 grid-rows-3 p-3 gap-2"></div><canvas id="scratch-canvas" class="absolute inset-0 w-full h-full z-20"></canvas></div>
+<p class="text-xs text-slate-400 mt-4">Usa tu dedo para raspar. Al 50% se revela todo.</p>
+<div id="next-action-wrapper" class="mt-5 hidden"><button id="btn-next-card" onclick="advanceNextCardOrFinish()" class="w-full bg-purple-600 font-bold py-3 rounded-xl">Siguiente</button></div>
+</div>
+<div id="blocked-view" class="w-full max-w-md bg-slate-900 rounded-2xl p-8 text-center hidden">
 <div id="finished-icon" class="text-6xl mb-4">🏆</div>
-<h2 id="finished-title" class="text-2xl font-black text-white mb-2">¡TERMINADO!</h2>
+<h2 id="finished-title" class="text-2xl font-black mb-2">¡TERMINADO!</h2>
 <p id="finished-subtitle" class="text-lg font-bold text-amber-400">Ganaste Gs. 10.000</p>
-<p class="text-slate-400 text-sm mt-3">Este enlace ya fue utilizado y no se puede volver a raspar.<br>Mostrá esta pantalla a tu vendedor para reclamar tu premio.</p>
-<p id="finished-code" class="text-[11px] text-slate-500 mt-4 font-mono"></p>
-<a id="finished-wa" href="#" target="_blank" class="inline-block mt-5 bg-emerald-600 text-white font-bold py-3 px-5 rounded-xl">💬 Avisar a mi vendedor por WhatsApp</a>
+<p class="text-slate-400 text-sm mt-3">Este enlace ya fue utilizado.<br>Mostrá esta pantalla a tu vendedor.</p>
+<p id="finished-code" class="text-xs text-slate-500 mt-4"></p>
+<a id="finished-wa" href="#" target="_blank" class="inline-block mt-5 bg-emerald-600 font-bold py-3 px-5 rounded-xl">💬 Avisar a mi vendedor</a>
 </div>
 </main>
-<canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none w-full h-full z-50 hidden"></canvas>
-<footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900/60">Plataforma Segura de Raspaditas Virtuales &copy; 2026</footer>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAxW-J1Rn70S4Bv5cVWtY5h7peSJ3Uo8V8",
-  authDomain: "raspadita-online.firebaseapp.com",
-  databaseURL: "https://raspadita-online-default-rtdb.firebaseio.com",
-  projectId: "raspadita-online",
-  storageBucket: "raspadita-online.firebasestorage.app",
-  messagingSenderId: "930757147695",
-  appId: "1:930757147695:web:d4cd3f1713f215042a9ada"
-};
-let dbFirebase = null;
-try{ if(window.firebase){ firebase.initializeApp(firebaseConfig); dbFirebase = firebase.database(); } }catch(e){ console.log("Firebase no disponible, sigo en local", e); }
-const AudioEngine={ctx:null,init(){if(!this.ctx)try{this.ctx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}},playScratch(){try{this.init();if(!this.ctx)return;let b=this.ctx.createBuffer(1,this.ctx.sampleRate*.05,this.ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;let n=this.ctx.createBufferSource();n.buffer=b;let f=this.ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1000;let g=this.ctx.createGain();g.gain.setValueAtTime(.08,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.01,this.ctx.currentTime+.05);n.connect(f);f.connect(g);g.connect(this.ctx.destination);n.start()}catch(e){}},
-playSelect(){try{this.init();if(!this.ctx)return;let o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='sine';o.frequency.setValueAtTime(600,this.ctx.currentTime);o.frequency.exponentialRampToValueAtTime(300,this.ctx.currentTime+.1);g.gain.setValueAtTime(.1,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.01,this.ctx.currentTime+.1);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+.1)}catch(e){}},
-playWinFanfare(){try{this.init();if(!this.ctx)return;let now=this.ctx.currentTime;[523.25,659.25,783.99,1046.5].forEach((fr,ix)=>{let o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(fr,now+ix*.1);g.gain.setValueAtTime(.12,now+ix*.1);g.gain.exponentialRampToValueAtTime(.01,now+ix*.1+.4);o.connect(g);g.connect(this.ctx.destination);o.start(now+ix*.1);o.stop(now+ix*.1+.4)})}catch(e){}},
-playLoseSound(){try{this.init();if(!this.ctx)return;let now=this.ctx.currentTime,o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(220,now);o.frequency.linearRampToValueAtTime(110,now+.4);g.gain.setValueAtTime(.15,now);g.gain.exponentialRampToValueAtTime(.01,now+.4);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(now+.4)}catch(e){}}};
-const DB={getLinks(){try{let l=localStorage.getItem('scratch_links_v2');return l?JSON.parse(l):{}}catch(e){return{}}},saveLinks(l){try{localStorage.setItem('scratch_links_v2',JSON.stringify(l))}catch(e){}},getStats(){try{let s=localStorage.getItem('scratch_stats_v2');return s?JSON.parse(s):{withPrize:0,withoutPrize:0}}catch(e){return{withPrize:0,withoutPrize:0}}},saveStats(s){try{localStorage.setItem('scratch_stats_v2',JSON.stringify(s))}catch(e){}}};
-function getFinished(){try{return JSON.parse(localStorage.getItem('scratch_finished_v2')||'{}')}catch(e){return{}}}
-function saveFinished(id, data){try{let f=getFinished(); f[id]=data; localStorage.setItem('scratch_finished_v2', JSON.stringify(f));}catch(e){}}
-function hideLoading(){let el=document.getElementById('loading-msg'); if(el) el.style.display='none';}
-function showFinishedScreen(id, won, prizeAmount){
-  hideLoading();
+var FB_URL = "https://raspadita-online-default-rtdb.firebaseio.com/raspaditas_usadas";
+var withPrize = true, selCarton = null, game = null, cardIdx = 0, finishedScratch = false, canvas = null, ctx = null, drawing = false, lastX = 0, lastY = 0;
+var SYMBOLS = ['🐶','🐱','🦁','🐯','🐼','🐻','🦊','🐰','🐵'];
+var AMOUNTS = ['5.000','10.000','20.000','50.000','100.000','500.000','1.000.000','3.000.000','5.000.000'];
+function getLinks(){ try{ return JSON.parse(localStorage.getItem('scratch_links_v2')||'{}'); }catch(e){ return {}; } }
+function saveLinks(l){ try{ localStorage.setItem('scratch_links_v2', JSON.stringify(l)); }catch(e){} }
+function getFinished(){ try{ return JSON.parse(localStorage.getItem('scratch_finished_v2')||'{}'); }catch(e){ return {}; } }
+function saveFinished(id,d){ try{ var f=getFinished(); f[id]=d; localStorage.setItem('scratch_finished_v2', JSON.stringify(f)); }catch(e){} }
+function showFinished(id,won,prize){
   document.getElementById('player-select-view').classList.add('hidden');
   document.getElementById('player-scratch-view').classList.add('hidden');
   document.getElementById('blocked-view').classList.remove('hidden');
   if(won){
     document.getElementById('finished-icon').innerText='🏆';
     document.getElementById('finished-title').innerText='¡TERMINADO! ¡GANASTE!';
-    document.getElementById('finished-subtitle').innerText='Ganaste Gs. ' + prizeAmount;
-    document.getElementById('finished-subtitle').className='text-lg font-bold text-amber-400';
-    document.getElementById('finished-wa').innerText='💬 Reclamar mi premio de Gs. ' + prizeAmount;
-    document.getElementById('finished-wa').href='https://wa.me/?text='+encodeURIComponent('Hola! Ya raspé mi raspadita y GANÉ Gs. '+prizeAmount+' 🏆 Mi código es: '+id);
+    document.getElementById('finished-subtitle').innerText='Ganaste Gs. '+prize;
+    document.getElementById('finished-wa').innerText='💬 Reclamar mi premio de Gs. '+prize;
+    document.getElementById('finished-wa').href='https://wa.me/?text='+encodeURIComponent('Hola! Gané Gs. '+prize+' 🏆 Código: '+id);
   } else {
     document.getElementById('finished-icon').innerText='🍀';
     document.getElementById('finished-title').innerText='TERMINADO';
     document.getElementById('finished-subtitle').innerText='Terminaste Sin Premio';
-    document.getElementById('finished-subtitle').className='text-lg font-bold text-slate-300';
     document.getElementById('finished-wa').innerText='💬 Avisar a mi vendedor';
-    document.getElementById('finished-wa').href='https://wa.me/?text='+encodeURIComponent('Hola! Ya raspé mi raspadita y terminé Sin Premio. Mi código es: '+id);
+    document.getElementById('finished-wa').href='https://wa.me/?text='+encodeURIComponent('Hola! Terminé Sin Premio. Código: '+id);
   }
   document.getElementById('finished-code').innerText='Código: '+id;
 }
-function marcarUsadoEnNube(id, won, prize){
-  saveFinished(id, {won:won, prize:prize});
-  if(dbFirebase){ try{ dbFirebase.ref('raspaditas_usadas/' + id).set({won:won, prize:prize, at: new Date().toISOString()}); }catch(e){} }
-  let links=DB.getLinks();
-  if(links[id]){ links[id].status='usado'; DB.saveLinks(links); }
+function marcarNube(id,won,prize){
+  saveFinished(id,{won:won,prize:prize});
+  try{ fetch(FB_URL+'/'+id+'.json',{method:'PUT',body:JSON.stringify({won:won,prize:prize,at:new Date().toISOString()})}); }catch(e){}
+  var l=getLinks(); if(l[id]){ l[id].status='usado'; saveLinks(l); }
 }
-function consultarNube(id, callback){
-  let fin = getFinished()[id];
-  if(fin){ callback(fin); return; }
-  if(!dbFirebase){ callback(null); return; }
-  dbFirebase.ref('raspaditas_usadas/' + id).once('value').then(snap=>{
-    let v = snap.val();
-    if(v){ saveFinished(id, v); callback(v); }
-    else callback(null);
-  }).catch(()=>callback(null));
+function consultarNube(id,cb){
+  var fin=getFinished()[id]; if(fin){ cb(fin); return; }
+  fetch(FB_URL+'/'+id+'.json').then(function(r){return r.json();}).then(function(v){ if(v){ saveFinished(id,v); cb(v); } else cb(null); }).catch(function(){ cb(null); });
 }
-let currentGenerationTypeWithPrize=true,selectedCartonIndex=null,activeGameLink=null,activeCardIndex=0,isScratchingFinished=false,scratchCanvas=null,scratchCtx=null,isDrawing=false,lastX=0,lastY=0;
-const POOL_SIMBOLOS=['🐶','🐱','🦁','🐯','🐼','🐻','🦊','🐰','🐵'],POOL_MONTOS=['5.000','10.000','20.000','50.000','100.000','500.000','1.000.000','3.000.000','5.000.000'];
-function initApp(){
-  try{
-    scratchCanvas=document.getElementById('scratch-canvas');
-    if(scratchCanvas) scratchCtx=scratchCanvas.getContext('2d');
-    hideLoading();
-    let p=new URLSearchParams(location.search),t=p.get('card');
-    if(t) loadPlayerView(t); else loadAdminView();
-  }catch(e){
-    hideLoading();
-    document.getElementById('admin-view').classList.remove('hidden');
-  }
+function init(){
+  canvas=document.getElementById('scratch-canvas'); if(canvas) ctx=canvas.getContext('2d');
+  var p=new URLSearchParams(location.search); var t=p.get('card');
+  if(t) loadPlayer(t); else loadAdmin();
 }
-if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', initApp); } else { initApp(); }
-setTimeout(function(){ let a=document.getElementById('admin-view'), b=document.getElementById('blocked-view'), s=document.getElementById('player-select-view'), sc=document.getElementById('player-scratch-view'); if(a && a.classList.contains('hidden') && b.classList.contains('hidden') && s.classList.contains('hidden') && sc.classList.contains('hidden')){ hideLoading(); a.classList.remove('hidden'); } }, 2500);
-function loadAdminView(){
-  hideLoading();
-  document.getElementById('admin-view').classList.remove('hidden');updateAdminStatsDisplay();renderLinksTable();
-  if(dbFirebase){
-    try{
-    dbFirebase.ref('raspaditas_usadas').on('value', snap=>{
-      let data = snap.val()||{};
-      let links = DB.getLinks();
-      let cambio=false;
-      Object.keys(data).forEach(id=>{
-        if(links[id] && links[id].status!=='usado'){ links[id].status='usado'; cambio=true; }
-        saveFinished(id, data[id]);
-      });
-      if(cambio){ DB.saveLinks(links); }
-      renderLinksTable();
-    });
-    }catch(e){}
-  }
+function loadAdmin(){
+  document.getElementById('admin-view').classList.remove('hidden');
+  updateStats(); renderLinks();
+  fetch(FB_URL+'.json').then(function(r){return r.json();}).then(function(data){
+    if(!data) return; var l=getLinks(); Object.keys(data).forEach(function(id){ if(l[id]) l[id].status='usado'; saveFinished(id,data[id]); }); saveLinks(l); renderLinks();
+  }).catch(function(){});
 }
-function setPrizeType(h){currentGenerationTypeWithPrize=h;let b1=document.getElementById('btn-type-prize'),b2=document.getElementById('btn-type-noprize'),w=document.getElementById('wrapper-prize-amount');if(h){b1.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-amber-500/20 border-amber-500 text-amber-300";b2.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-slate-900 border-slate-700 text-slate-400";w.classList.remove('hidden')}else{b2.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-purple-500/20 border-purple-500 text-purple-300";b1.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-slate-900 border-slate-700 text-slate-400";w.classList.add('hidden')}}
-function updateQtyLabel(v){document.getElementById('qty-label').textContent=v}
-function updateAdminStatsDisplay(){let links=DB.getLinks(),keys=Object.keys(links),total=keys.length,totalPremiado=0,con=0;keys.forEach(k=>{let l=links[k];if(l.withPrize){con++;let m=Number(String(l.prizeAmount).replace(/\./g,''));if(!isNaN(m))totalPremiado+=m}});document.getElementById('stat-total').textContent=total;document.getElementById('stat-total-premiado').textContent=totalPremiado.toLocaleString('es-PY')+" Gs";document.getElementById('stat-premiado-count').textContent=con+" cartones con premio"}
-function generateScratchLink(){let qty=parseInt(document.getElementById('card-quantity').value)||1,prize=document.getElementById('prize-amount').value||'10.000',id='rc_'+Math.random().toString(36).substring(2,11),payload={id:id,w:currentGenerationTypeWithPrize,a:currentGenerationTypeWithPrize?prize:'0',q:qty},token=btoa(JSON.stringify(payload)),links=DB.getLinks();links[id]={token:token,uniqueId:id,withPrize:currentGenerationTypeWithPrize,prizeAmount:currentGenerationTypeWithPrize?prize:'0',totalCards:qty,status:'disponible',result:'',createdAt:new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})};DB.saveLinks(links);let s=DB.getStats();if(currentGenerationTypeWithPrize)s.withPrize++;else s.withoutPrize++;DB.saveStats(s);updateAdminStatsDisplay();renderLinksTable()}
-function generateSymbolMatrix(win,prize){let m=[];if(win){let ws=POOL_SIMBOLOS[Math.floor(Math.random()*POOL_SIMBOLOS.length)];for(let i=0;i<3;i++)m.push({symbol:ws,amount:prize});let av=POOL_SIMBOLOS.filter(s=>s!==ws);av.sort(()=>Math.random()-.5);for(let i=0;i<6;i++){let a=av[i%av.length],fa=POOL_MONTOS.filter(x=>x!==prize),ra=fa[Math.floor(Math.random()*fa.length)];m.push({symbol:a,amount:ra})}}else{let sp=[...POOL_SIMBOLOS,...POOL_SIMBOLOS].sort(()=>Math.random()-.5),c={};for(let s of
+function setPrizeType(h){ withPrize=h; var b1=document.getElementById('btn-type-prize'), b2=document.getElementById('btn-type-noprize'), w=document.getElementById('wrapper-prize-amount'); if(h){ b1.className='py-2 rounded-lg bg-amber-500/20 border border-amber-500 text-amber-300 text-sm font-bold'; b2.className='py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 text-sm font-bold'; w.classList.remove('hidden'); } else { b2.className='py-2 rounded-lg bg-purple-500/20 border border-purple-500 text-purple-300 text-sm font-bold'; b1.className='py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 text-sm font-bold'; w.classList.add('hidden'); } }
+function updateStats(){ var links=getLinks(), keys=Object.keys(links), total=0, prem=0, con=0; keys.forEach(function(k){ var l=links[k]; total+=Number(l.totalCards||1); if(l.withPrize){ con++; var m=Number(String(l.prizeAmount).replace(/\./g,'')); if(!isNaN(m)) prem+=m; } }); document.getElementById('stat-total').textContent=total; document.getElementById('stat-total-premiado').textContent=prem.toLocaleString('es-PY')+' Gs'; document.getElementById('stat-premiado-count').textContent=con+' con premio'; }
+function generateScratchLink(){ var qty=parseInt(document.getElementById('card-quantity').value)||1; var prize=document.getElementById('prize-amount').value||'10.000'; var id='rc_'+Math.random().toString(36).substring(2,11); var payload={id:id,w:withPrize,a:withPrize?prize:'0',q:qty}; var token=btoa(JSON.stringify(payload)); var links=getLinks(); links[id]={token:token,uniqueId:id,withPrize:withPrize,prizeAmount:withPrize?prize:'0',totalCards:qty,status:'disponible',createdAt:new Date().toLocaleDateString()}; saveLinks(links); updateStats(); renderLinks(); }
+function genMatrix(win,prize){ var m=[]; if(win){ var ws=SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]; for(var i=0;i<3;i++) m.push({symbol:ws,amount:prize}); var av=SYMBOLS.filter(function(s){return s!==ws;}); av.sort(function(){return Math.random()-.5;}); for(var j=0;j<6;j++){ var a=av[j%av.length]; var fa=AMOUNTS.filter(function(x){return x!==prize;}); m.push({symbol:a,amount:fa[Math.floor(Math.random()*fa.length)]}); } } else { var sp=SYMBOLS.concat(SYMBOLS); sp.sort(function(){return Math.random()-.5;}); var c={}; for(var k=0;k<sp.length;k++){ var s=sp[k]; if(!c[s]) c[s]=0; if(c[s]<2 && m.length<9){ m.push({symbol:s,amount:AMOUNTS[Math.floor(Math.random()*AMOUNTS.length)]}); c[s]++; } } while(m.length<9) m.push({symbol:SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)],amount:AMOUNTS[Math.floor(Math.random()*AMOUNTS.length)]}); } return m.sort(function(){return Math.random()-.5;}); }
+function renderLinks(){ var links=getLinks(), fin=getFinished(), body=document.getElementById('links-table-body'); body.innerHTML=''; var keys=Object.keys(links).reverse(); document.getElementById('no-links-msg').style.display=keys.length?'none':'block'; keys.forEach(function(k){ var d=links[k]; var url=location.origin+location.pathname+'?card='+d.token; var f=fin[k]; var used=d.status==='usado'||!!f; var estado=used?(f&&f.won?'🔴 USADO - Ganó '+f.prize+' Gs':'🔴 USADO - Sin Premio'):'🟢 Disponible'; var badge=d.withPrize?'Premio ('+d.prizeAmount+' Gs)':'Sin Premio'; var div=document.createElement('div'); div.className='bg-black/50 p-3 rounded-xl flex flex-col gap-1'; div.innerHTML='<b>Paquete de '+d.totalCards+' raspadita(s) - '+badge+'</b><span class="text-xs">'+estado+'</span><input readonly value="'+url+'" onclick="this.select()" class="bg-slate-900 rounded px-2 py-1 text-purple-300 text-xs w-full"><div class="flex gap-2"><button onclick="copyLink(\''+url+'\',this)" class="bg-slate-800 px-3 py-1 rounded text-xs">📋 Copiar</button><button onclick="marcarUsado(\''+k+'\')" class="bg-slate-800 px-3 py-1 rounded text-xs">✔️ Marcar Usado</button></div>'; body.appendChild(div); }); }
+function marcarUsado(id){ var l=getLinks(); if(!l[id]) return; var f=getFinished()[id]; if(!f) marcarNube(id,l[id].withPrize,l[id].prizeAmount); else marcarNube(id,f.won,f.prize); l[id].status='usado'; saveLinks(l); renderLinks(); }
+function copyLink(t,b){ var e=document.createElement('textarea'); e.value=t; document.body.appendChild(e); e.select(); try{document.execCommand('copy'); b.textContent='¡Copiado!'; setTimeout(function(){b.textContent='📋 Copiar';},2000);}catch(err){ prompt('Copia el enlace:',t); } document.body.removeChild(e); }
+function loadPlayer(token){ var p; try{ p=JSON.parse(atob(token)); }catch(e){ document.getElementById('error-view').classList.remove('hidden'); return; } consultarNube(p.id,function(fin){ if(fin){ showFinished(p.id,fin.won,fin.prize); return; } var played={}; try{ played=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}'); }catch(e){} if(played[p.id]){ showFinished(p.id,p.w,p.a); marcarNube(p.id,p.w,p.a); return; } var cards=[]; var winIdx=p.w?Math.floor(Math.random()*p.q):-1; for(var i=0;i<p.q;i++){ var isW=(i===winIdx); cards.push({isWinner:isW,prizeValue:isW?p.a:'0',gridSymbols:genMatrix(isW,p.a)}); } game={id:p.id,token:token,withPrize:p.w,prizeAmount:p.a,totalCards:p.q,cards:cards}; cardIdx=0; showSelect(); }); }
+function showSelect(){ document.getElementById('player-scratch-view').classList.add('hidden'); document.getElementById('player-select-view').classList.remove('hidden'); document.getElementById('player-badge-qty').textContent='Raspadita '+(cardIdx+1)+' de '+game.totalCards; selCarton=null; var b=document.getElementById('btn-confirm-select'); b.disabled=true; b.textContent='Selecciona un cartón'; for(var i=0;i<9;i++) document.getElementById('carton-'+i).className='shimmer rounded-xl border-2 border-slate-700'; }
+function selectCarton(ix){ selCarton=ix; for(var i=0;i<9;i++){ var c=document.getElementById('carton-'+i); if(i===ix) c.className='bg-purple-900/40 rounded-xl border-2 border-amber-400'; else c.className='shimmer rounded-xl border-2 border-slate-800 opacity-40'; } var b=document.getElementById('btn-confirm-select'); b.disabled=false; b.textContent='Confirmar y Raspar Cartón'; }
+function goToScratchPhase(){ if(selCarton===null) return; if(cardIdx===0){ var pl={}; try{pl=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}');}catch(e){} pl[game.id]=true; try{localStorage.setItem('scratch_played_tokens',JSON.stringify(pl));}catch(e){} } document.getElementById('player-select-view').classList.add('hidden'); document.getElementById('player-scratch-view').classList.remove('hidden'); setupScratch(); }
+function setupScratch(){ finishedScratch=false; document.getElementById('scratch-current-status').textContent='Raspadita '+(cardIdx+1)+' de '+game.totalCards; document.getElementById('scratch-percent-display').textContent='Raspado: 0%'; document.getElementById('next-action-wrapper').classList.add('hidden'); var cur=game.cards[cardIdx], grid=document.getElementById('symbols-grid'); grid.innerHTML=''; cur.gridSymbols.forEach(function(it,ix){ var d=document.createElement('div'); d.id='symbol-cell-'+ix; d.className='bg-slate-900 rounded-xl flex flex-col items-center justify-center p-1'; d.innerHTML='<span class="text-3xl">'+it.symbol+'</span><span class="text-xs text-amber-400 font-bold">'+it.amount+' Gs</span>'; grid.appendChild(d); }); if(!canvas) canvas=document.getElementById('scratch-canvas'); if(!ctx) ctx=canvas.getContext('2d'); canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; ctx.globalCompositeOperation='source-over'; var g=ctx.createLinearGradient(0,0,canvas.width,canvas.height); g.addColorStop(0,'#d97706'); g.addColorStop(.5,'#f59e0b'); g.addColorStop(1,'#b45309'); ctx.fillStyle=g; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#451a03'; ctx.textAlign='center'; ctx.font='bold 14px sans-serif'; ctx.fillText('RASPA TU ANIMAL DE LA SUERTE',canvas.width/2,canvas.height/2); canvas.addEventListener('mousedown',startScr); canvas.addEventListener('mousemove',doScr); window.addEventListener('mouseup',function(){drawing=false;}); canvas.addEventListener('touchstart',startScr,{passive:true}); canvas.addEventListener('touchmove',doScr,{passive:true}); window.addEventListener('touchend',function(){drawing=false;}); }
+function getCoords(e){ var r=canvas.getBoundingClientRect(); var x=e.touches?e.touches[0].clientX:e.clientX; var y=e.touches?e.touches[0].clientY:e.clientY; return {x:x-r.left,y:y-r.top}; }
+function startScr(e){ if(finishedScratch) return; drawing=true; var c=getCoords(e); lastX=c.x; lastY=c.y; }
+function doScr(e){ if(!drawing||finishedScratch) return; var c=getCoords(e); ctx.globalCompositeOperation='destination-out'; ctx.lineWidth=34; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(c.x,c.y); ctx.stroke(); lastX=c.x; lastY=c.y; checkPct(); }
+function checkPct(){ var d=ctx.getImageData(0,0,canvas.width,canvas.height).data, t=0, tot=0; for(var i=3;i<d.length;i+=80){ tot++; if(d[i]==0) t++; } var p=Math.round(t/tot*100); document.getElementById('scratch-percent-display').textContent='Raspado: '+p+'%'; if(p>=50 && !finishedScratch){ finishedScratch=true; drawing=false; ctx.clearRect(0,0,canvas.width,canvas.height); document.getElementById('scratch-percent-display').textContent='Raspado: 100%'; evalCard(); } }
+function evalCard(){ var cd=game.cards[cardIdx], counts={}, win=null; cd.gridSymbols.forEach(function(it){ counts[it.symbol]=(counts[it.symbol]||0)+1; if(counts[it.symbol]>=3) win=it.symbol; }); if(cd.isWinner && win){ cd.gridSymbols.forEach(function(it,ix){ if(it.symbol===win) document.getElementById('symbol-cell-'+ix).classList.add('winner'); }); setTimeout(function(){ alert('¡GANASTE '+cd.prizeValue+' Gs!'); },300); } else { setTimeout(function(){ alert('Sin Premio, seguí intentando'); },300); } document.getElementById('next-action-wrapper').classList.remove('hidden'); var n=document.getElementById('btn-next-card'); if(cardIdx+1<game.totalCards) n.textContent='Ir a Siguiente Raspadita ➡️'; else n.textContent='Finalizar y Ver Resultado 🏁'; }
+function advanceNextCardOrFinish(){ cardIdx++; if(cardIdx<game.totalCards) showSelect(); else { marcarNube(game.id,game.withPrize,game.prizeAmount); showFinished(game.id,game.withPrize,game.prizeAmount); } }
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+</script>
+</body>
+</html>
