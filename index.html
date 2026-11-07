@@ -29,8 +29,8 @@ body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 
 <!-- SOLO 2 TOTALES -->
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-<div class="bg-slate-950 p-5 rounded-xl border border-slate-800/60 text-center"><p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total de Cartones Generados</p><p id="stat-total" class="text-4xl font-black text-white mt-1">0</p><p class="text-[11px] text-slate-500 mt-1">Enlaces creados en total</p></div>
-<div class="bg-slate-950 p-5 rounded-xl border border-amber-500/20 text-center"><p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Premiado</p><p id="stat-total-premiado" class="text-4xl font-black text-amber-400 mt-1">$ 0</p><p id="stat-premiado-count" class="text-[11px] text-slate-400 mt-1">0 cartones con premio</p></div>
+<div class="bg-slate-950 p-5 rounded-xl border border-slate-800/60 text-center"><p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total de Cartones Generados</p><p id="stat-total" class="text-4xl font-black text-white mt-1">0</p><p class="text-[11px] text-slate-500 mt-1">Cartones vendidos en total</p></div>
+<div class="bg-slate-950 p-5 rounded-xl border border-amber-500/20 text-center"><p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Premiado</p><p id="stat-total-premiado" class="text-4xl font-black text-amber-400 mt-1">0 Gs</p><p id="stat-premiado-count" class="text-[11px] text-slate-400 mt-1">0 cartones con premio</p></div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -42,8 +42,8 @@ body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 <button type="button" id="btn-type-prize" onclick="setPrizeType(true)" class="py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-amber-500/20 border-amber-500 text-amber-300">🎁 Con Premio</button>
 <button type="button" id="btn-type-noprize" onclick="setPrizeType(false)" class="py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-slate-900 border-slate-700 text-slate-400">❌ Sin Premio</button>
 </div></div>
-<div id="wrapper-prize-amount"><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Monto del Premio ($)</label>
-<select id="prize-amount" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white font-bold"><option value="5.000">5.000</option><option value="10.000" selected>10.000</option><option value="20.000">20.000</option><option value="50.000">50.000</option><option value="100.000">100.000</option><option value="500.000">500.000</option><option value="1.000.000">1.000.000</option><option value="3.000.000">3.000.000</option><option value="5.000.000">5.000.000</option></select></div>
+<div id="wrapper-prize-amount"><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Monto del Premio</label>
+<select id="prize-amount" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white font-bold"><option value="5.000">5.000 Gs</option><option value="10.000" selected>10.000 Gs</option><option value="20.000">20.000 Gs</option><option value="50.000">50.000 Gs</option><option value="100.000">100.000 Gs</option><option value="500.000">500.000 Gs</option><option value="1.000.000">1.000.000 Gs</option><option value="3.000.000">3.000.000 Gs</option><option value="5.000.000">5.000.000 Gs</option></select></div>
 <div><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Cantidad de Raspaditas (Max 10)</label>
 <div class="flex items-center gap-3"><input type="range" id="card-quantity" min="1" max="10" value="1" oninput="updateQtyLabel(this.value)" class="w-full accent-purple-500"><span id="qty-label" class="bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 px-3 py-1 rounded-md text-sm min-w-[36px] text-center">1</span></div>
 <p class="text-[11px] text-slate-500 mt-1">El jugador raspará esta cantidad de cartones secuencialmente.</p></div>
@@ -88,14 +88,13 @@ body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 <div id="next-action-wrapper" class="mt-5 hidden"><button id="btn-next-card" onclick="advanceNextCardOrFinish()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl">Siguiente</button></div>
 </div>
 
-<!-- NUEVO: TERMINADO CON RESULTADO -->
+<!-- TERMINADO SIN BOTONES - COMO PIDIO JOSE -->
 <div id="blocked-view" class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-2xl p-8 text-center hidden">
 <div id="finished-icon" class="text-6xl mb-4">🏆</div>
 <h2 id="finished-title" class="text-2xl font-black text-white mb-2">¡TERMINADO!</h2>
-<p id="finished-subtitle" class="text-lg font-bold text-amber-400">Ganaste Gs. 10.000</p>
-<p class="text-slate-400 text-sm mt-3">Este enlace ya fue utilizado y no se puede volver a raspar.<br>Mostrá esta pantalla a tu vendedor para reclamar tu premio.</p>
+<p id="finished-subtitle" class="text-lg font-bold text-amber-400">Ganaste 10.000 Gs</p>
+<p class="text-slate-400 text-sm mt-3">Este enlace ya fue utilizado y no se puede volver a raspar.</p>
 <p id="finished-code" class="text-[11px] text-slate-500 mt-4 font-mono"></p>
-<a id="finished-wa" href="#" target="_blank" class="inline-block mt-5 bg-emerald-600 text-white font-bold py-3 px-5 rounded-xl">💬 Avisar a mi vendedor por WhatsApp</a>
 </div>
 
 </main>
@@ -110,7 +109,6 @@ playLoseSound(){this.init();let now=this.ctx.currentTime,o=this.ctx.createOscill
 
 const DB={getLinks(){let l=localStorage.getItem('scratch_links_v2');return l?JSON.parse(l):{}},saveLinks(l){localStorage.setItem('scratch_links_v2',JSON.stringify(l))},getStats(){let s=localStorage.getItem('scratch_stats_v2');return s?JSON.parse(s):{withPrize:0,withoutPrize:0}},saveStats(s){localStorage.setItem('scratch_stats_v2',JSON.stringify(s))}};
 
-// NUEVO: Guardamos el resultado final para mostrarlo siempre
 function getFinished(){try{return JSON.parse(localStorage.getItem('scratch_finished_v2')||'{}')}catch(e){return{}}}
 function saveFinished(id, data){let f=getFinished(); f[id]=data; localStorage.setItem('scratch_finished_v2', JSON.stringify(f));}
 function showFinishedScreen(id, won, prizeAmount){
@@ -120,17 +118,13 @@ function showFinishedScreen(id, won, prizeAmount){
   if(won){
     document.getElementById('finished-icon').innerText='🏆';
     document.getElementById('finished-title').innerText='¡TERMINADO! ¡GANASTE!';
-    document.getElementById('finished-subtitle').innerText='Ganaste Gs. ' + prizeAmount;
+    document.getElementById('finished-subtitle').innerText='Ganaste ' + prizeAmount + ' Gs';
     document.getElementById('finished-subtitle').className='text-lg font-bold text-amber-400';
-    document.getElementById('finished-wa').innerText='💬 Reclamar mi premio de Gs. ' + prizeAmount;
-    document.getElementById('finished-wa').href='https://wa.me/?text='+encodeURIComponent('Hola! Ya raspé mi raspadita y GANÉ Gs. '+prizeAmount+' 🏆 Mi código es: '+id);
   } else {
     document.getElementById('finished-icon').innerText='🍀';
     document.getElementById('finished-title').innerText='TERMINADO';
     document.getElementById('finished-subtitle').innerText='Terminaste Sin Premio';
     document.getElementById('finished-subtitle').className='text-lg font-bold text-slate-300';
-    document.getElementById('finished-wa').innerText='💬 Avisar a mi vendedor';
-    document.getElementById('finished-wa').href='https://wa.me/?text='+encodeURIComponent('Hola! Ya raspé mi raspadita y terminé Sin Premio. Mi código es: '+id);
   }
   document.getElementById('finished-code').innerText='Código: '+id;
 }
@@ -141,7 +135,19 @@ window.onload=function(){let p=new URLSearchParams(location.search),t=p.get('car
 function loadAdminView(){document.getElementById('admin-view').classList.remove('hidden');updateAdminStatsDisplay();renderLinksTable(); window.addEventListener('storage',()=>{renderLinksTable();updateAdminStatsDisplay()})}
 function setPrizeType(h){currentGenerationTypeWithPrize=h;let b1=document.getElementById('btn-type-prize'),b2=document.getElementById('btn-type-noprize'),w=document.getElementById('wrapper-prize-amount');if(h){b1.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-amber-500/20 border-amber-500 text-amber-300";b2.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-slate-900 border-slate-700 text-slate-400";w.classList.remove('hidden')}else{b2.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-purple-500/20 border-purple-500 text-purple-300";b1.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-slate-900 border-slate-700 text-slate-400";w.classList.add('hidden')}}
 function updateQtyLabel(v){document.getElementById('qty-label').textContent=v}
-function updateAdminStatsDisplay(){let links=DB.getLinks(),keys=Object.keys(links),total=keys.length,totalPremiado=0,con=0;keys.forEach(k=>{let l=links[k];if(l.withPrize){con++;let m=Number(String(l.prizeAmount).replace(/\./g,''));if(!isNaN(m))totalPremiado+=m}});document.getElementById('stat-total').textContent=total;document.getElementById('stat-total-premiado').textContent="$ "+totalPremiado.toLocaleString('es-PY');document.getElementById('stat-premiado-count').textContent=con+" cartones con premio"}
+
+// CAMBIO JOSE: Total Cartones = suma de cartones de cada enlace (ventas), no cantidad de enlaces
+function updateAdminStatsDisplay(){
+  let links=DB.getLinks(),keys=Object.keys(links),totalCartones=0,totalPremiado=0,con=0;
+  keys.forEach(k=>{
+    let l=links[k];
+    totalCartones += Number(l.totalCards || 1);
+    if(l.withPrize){con++;let m=Number(String(l.prizeAmount).replace(/\./g,''));if(!isNaN(m))totalPremiado+=m}
+  });
+  document.getElementById('stat-total').textContent=totalCartones;
+  document.getElementById('stat-total-premiado').textContent=totalPremiado.toLocaleString('es-PY') + " Gs";
+  document.getElementById('stat-premiado-count').textContent=con+" cartones con premio"
+}
 function generateScratchLink(){let qty=parseInt(document.getElementById('card-quantity').value)||1,prize=document.getElementById('prize-amount').value||'10.000',id='rc_'+Math.random().toString(36).substring(2,11),payload={id:id,w:currentGenerationTypeWithPrize,a:currentGenerationTypeWithPrize?prize:'0',q:qty},token=btoa(JSON.stringify(payload)),links=DB.getLinks();links[id]={token:token,uniqueId:id,withPrize:currentGenerationTypeWithPrize,prizeAmount:currentGenerationTypeWithPrize?prize:'0',totalCards:qty,status:'disponible',result:'',createdAt:new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})};DB.saveLinks(links);let s=DB.getStats();if(currentGenerationTypeWithPrize)s.withPrize++;else s.withoutPrize++;DB.saveStats(s);updateAdminStatsDisplay();renderLinksTable()}
 function generateSymbolMatrix(win,prize){let m=[];if(win){let ws=POOL_SIMBOLOS[Math.floor(Math.random()*POOL_SIMBOLOS.length)];for(let i=0;i<3;i++)m.push({symbol:ws,amount:prize});let av=POOL_SIMBOLOS.filter(s=>s!==ws);av.sort(()=>Math.random()-.5);for(let i=0;i<6;i++){let a=av[i%av.length],fa=POOL_MONTOS.filter(x=>x!==prize),ra=fa[Math.floor(Math.random()*fa.length)];m.push({symbol:a,amount:ra})}}else{let sp=[...POOL_SIMBOLOS,...POOL_SIMBOLOS].sort(()=>Math.random()-.5),c={};for(let s of sp){if(!c[s])c[s]=0;if(c[s]<2&&m.length<9){m.push({symbol:s,amount:POOL_MONTOS[Math.floor(Math.random()*POOL_MONTOS.length)]});c[s]++}}while(m.length<9)m.push({symbol:POOL_SIMBOLOS[Math.floor(Math.random()*POOL_SIMBOLOS.length)],amount:POOL_MONTOS[Math.floor(Math.random()*POOL_MONTOS.length)]})}return m.sort(()=>Math.random()-.5)}
 
@@ -152,12 +158,11 @@ function renderLinksTable(){
   keys.forEach(k=>{
     let d=links[k], tr=document.createElement('tr'); tr.className="hover:bg-slate-900/40";
     let url=location.origin+location.pathname+'?card='+d.token;
-    let badge=d.withPrize?`<span class="text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">Premio ($${d.prizeAmount})</span>`:`<span class="text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Sin Premio</span>`;
-    // NUEVO ESTADO: Si ya está en finished o status usado, muestra USADO
+    let badge=d.withPrize?`<span class="text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">Premio (${d.prizeAmount} Gs)</span>`:`<span class="text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Sin Premio</span>`;
     let fin=finished[k];
     let isUsed = d.status==='usado' || !!fin;
     let estadoHtml = isUsed
-      ? (fin && fin.won ? `<span class="text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">🔴 USADO - Ganó $${fin.prize}</span>` : `<span class="text-rose-300 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded font-bold">🔴 USADO - Sin Premio</span>`)
+      ? (fin && fin.won ? `<span class="text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">🔴 USADO - Ganó ${fin.prize} Gs</span>` : `<span class="text-rose-300 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded font-bold">🔴 USADO - Sin Premio</span>`)
       : `<span class="text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded">🟢 Disponible</span>`;
     tr.innerHTML=`<td class="p-3"><div class="font-bold text-white">Paquete de ${d.totalCards} raspadita(s)</div><div class="text-slate-500 text-[10px]">${d.createdAt} | ${badge}</div></td><td class="p-3"><input type="text" readonly value="${url}" onclick="this.select();" class="bg-slate-900 border border-slate-700/60 rounded px-2.5 py-1 text-purple-300 w-full max-w-[240px] text-xs"></td><td class="p-3 text-center">${estadoHtml}</td><td class="p-3 text-right"><button onclick="copyToClipboard('${url}',this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded">📋 Copiar</button> <button onclick="marcarUsado('${k}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded">✔️ Marcar Usado</button></td>`;
     tbody.appendChild(tr)
@@ -168,7 +173,6 @@ function marcarUsado(id){
   if(!links[id]) return;
   let fin=getFinished()[id];
   if(!fin){
-    // Si vos lo marcas manual, toma el resultado que configuraste
     let won=links[id].withPrize;
     let prize=links[id].prizeAmount;
     saveFinished(id,{won:won, prize:prize});
@@ -182,46 +186,50 @@ function copyToClipboard(t,b){let e=document.createElement('textarea');e.value=t
 
 function loadPlayerView(token){
   let p;try{p=JSON.parse(atob(token))}catch(e){document.getElementById('error-view').classList.remove('hidden');return}
-  // NUEVO: Si ya terminó, mostrar directo el resultado, no dejar raspar
   let fin=getFinished()[p.id];
-  if(fin){
-    showFinishedScreen(p.id, fin.won, fin.prize);
-    return;
-  }
+  if(fin){ showFinishedScreen(p.id, fin.won, fin.prize); return; }
   let played=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}');
-  if(played[p.id]){
-    // Si empezó pero no terminó, igual lo tratamos como terminado para que no re-raspe
-    // Buscamos si era ganador por el token
-    let won = p.w;
-    let prize = p.a;
-    showFinishedScreen(p.id, won, prize);
-    return;
-  }
+  if(played[p.id]){ let won = p.w; let prize = p.a; showFinishedScreen(p.id, won, prize); return; }
   let cards=[],winIdx=p.w?Math.floor(Math.random()*p.q):-1;for(let i=0;i<p.q;i++){let isW=(i===winIdx);cards.push({isWinner:isW,prizeValue:isW?p.a:'0',gridSymbols:generateSymbolMatrix(isW,p.a)})}
   activeGameLink={id:p.id,token:token,withPrize:p.w,prizeAmount:p.a,totalCards:p.q,cards:cards};activeCardIndex=0;showSelectionScreen()
 }
 function showSelectionScreen(){document.getElementById('player-scratch-view').classList.add('hidden');document.getElementById('player-select-view').classList.remove('hidden');document.getElementById('player-badge-qty').textContent=`Raspadita ${activeCardIndex+1} de ${activeGameLink.totalCards}`;selectedCartonIndex=null;let b=document.getElementById('btn-confirm-select');b.disabled=true;b.className="w-full max-w-xs bg-slate-800 text-slate-500 font-bold py-3 rounded-xl";b.textContent="Selecciona un cartón";for(let i=0;i<9;i++){document.getElementById(`carton-${i}`).className="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-300 text-lg font-bold scratch-card"}}
 function selectCarton(ix){AudioEngine.playSelect();selectedCartonIndex=ix;for(let i=0;i<9;i++){let c=document.getElementById(`carton-${i}`);if(i===ix)c.className="bg-purple-900/40 rounded-xl border-2 border-amber-400 text-amber-300 text-lg font-bold scratch-card";else c.className="shimmer-bg rounded-xl border-2 border-slate-800 text-slate-600 flex flex-col items-center justify-center p-2 text-lg font-bold opacity-40"}let b=document.getElementById('btn-confirm-select');b.disabled=false;b.className="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold py-3 rounded-xl";b.textContent="Confirmar y Raspar Cartón"}
 function goToScratchPhase(){if(selectedCartonIndex===null)return;AudioEngine.playSelect();if(activeCardIndex===0){let pl=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}');pl[activeGameLink.id]=true;localStorage.setItem('scratch_played_tokens',JSON.stringify(pl))}document.getElementById('player-select-view').classList.add('hidden');document.getElementById('player-scratch-view').classList.remove('hidden');setupScratchCardGame()}
-function setupScratchCardGame(){isScratchingFinished=false;document.getElementById('scratch-current-status').textContent=`Raspadita ${activeCardIndex+1} de ${activeGameLink.totalCards}`;document.getElementById('scratch-percent-display').textContent="Raspado: 0%";document.getElementById('next-action-wrapper').classList.add('hidden');let cur=activeGameLink.cards[activeCardIndex],grid=document.getElementById('symbols-grid');grid.innerHTML='';cur.gridSymbols.forEach((it,ix)=>{let c=document.createElement('div');c.id=`symbol-cell-${ix}`;c.className="bg-slate-900 border border-slate-800/80 rounded-xl flex flex-col items-center justify-center p-1";c.innerHTML=`<span class="text-3xl md:text-4xl">${it.symbol}</span><span class="text-[10px] md:text-xs text-amber-400/90 font-bold mt-1">$${it.amount}</span>`;grid.appendChild(c)});scratchCanvas.width=scratchCanvas.offsetWidth;scratchCanvas.height=scratchCanvas.offsetHeight;scratchCtx.globalCompositeOperation='source-over';let g=scratchCtx.createLinearGradient(0,0,scratchCanvas.width,scratchCanvas.height);g.addColorStop(0,'#d97706');g.addColorStop(.5,'#f59e0b');g.addColorStop(1,'#b45309');scratchCtx.fillStyle=g;scratchCtx.fillRect(0,0,scratchCanvas.width,scratchCanvas.height);scratchCtx.font='bold 15px sans-serif';scratchCtx.fillStyle='#451a03';scratchCtx.textAlign='center';scratchCtx.textBaseline='middle';scratchCtx.fillText('RASPA TU ANIMAL DE LA SUERTE',scratchCanvas.width/2,scratchCanvas.height/2);scratchCanvas.addEventListener('mousedown',startScratching);scratchCanvas.addEventListener('mousemove',scratchAction);window.addEventListener('mouseup',stopScratching);scratchCanvas.addEventListener('touchstart',startScratching,{passive:true});scratchCanvas.addEventListener('touchmove',scratchAction,{passive:true});window.addEventListener('touchend',stopScratching)}
+function setupScratchCardGame(){isScratchingFinished=false;document.getElementById('scratch-current-status').textContent=`Raspadita ${activeCardIndex+1} de ${activeGameLink.totalCards}`;document.getElementById('scratch-percent-display').textContent="Raspado: 0%";document.getElementById('next-action-wrapper').classList.add('hidden');let cur=activeGameLink.cards[activeCardIndex],grid=document.getElementById('symbols-grid');grid.innerHTML='';cur.gridSymbols.forEach((it,ix)=>{let c=document.createElement('div');c.id=`symbol-cell-${ix}`;c.className="bg-slate-900 border border-slate-800/80 rounded-xl flex flex-col items-center justify-center p-1";c.innerHTML=`<span class="text-3xl md:text-4xl">${it.symbol}</span><span class="text-[10px] md:text-xs text-amber-400/90 font-bold mt-1">${it.amount} Gs</span>`;grid.appendChild(c)});scratchCanvas.width=scratchCanvas.offsetWidth;scratchCanvas.height=scratchCanvas.offsetHeight;scratchCtx.globalCompositeOperation='source-over';let g=scratchCtx.createLinearGradient(0,0,scratchCanvas.width,scratchCanvas.height);g.addColorStop(0,'#d97706');g.addColorStop(.5,'#f59e0b');g.addColorStop(1,'#b45309');scratchCtx.fillStyle=g;scratchCtx.fillRect(0,0,scratchCanvas.width,scratchCanvas.height);scratchCtx.font='bold 15px sans-serif';scratchCtx.fillStyle='#451a03';scratchCtx.textAlign='center';scratchCtx.textBaseline='middle';scratchCtx.fillText('RASPA TU ANIMAL DE LA SUERTE',scratchCanvas.width/2,scratchCanvas.height/2);scratchCanvas.addEventListener('mousedown',startScratching);scratchCanvas.addEventListener('mousemove',scratchAction);window.addEventListener('mouseup',stopScratching);scratchCanvas.addEventListener('touchstart',startScratching,{passive:true});scratchCanvas.addEventListener('touchmove',scratchAction,{passive:true});window.addEventListener('touchend',stopScratching)}
 function startScratching(e){if(isScratchingFinished)return;isDrawing=true;let c=getEventCoords(e);lastX=c.x;lastY=c.y}
 function scratchAction(e){if(!isDrawing||isScratchingFinished)return;let c=getEventCoords(e);scratchCtx.globalCompositeOperation='destination-out';scratchCtx.lineWidth=34;scratchCtx.lineCap='round';scratchCtx.lineJoin='round';scratchCtx.beginPath();scratchCtx.moveTo(lastX,lastY);scratchCtx.lineTo(c.x,c.y);scratchCtx.stroke();lastX=c.x;lastY=c.y;if(Math.random()<.35)AudioEngine.playScratch();checkScratchPercentage()}
 function stopScratching(){isDrawing=false}
 function getEventCoords(e){let r=scratchCanvas.getBoundingClientRect(),x=e.touches?e.touches[0].clientX:e.clientX,y=e.touches?e.touches[0].clientY:e.clientY;return{x:x-r.left,y:y-r.top}}
 function checkScratchPercentage(){let w=scratchCanvas.width,h=scratchCanvas.height,d=scratchCtx.getImageData(0,0,w,h).data,trans=0,tot=0;for(let i=3;i<d.length;i+=80){tot++;if(d[i]==0)trans++}let p=Math.round(trans/tot*100);document.getElementById('scratch-percent-display').textContent=`Raspado: ${p}%`;if(p>=50&&!isScratchingFinished)autoRevealAll()}
 function autoRevealAll(){isScratchingFinished=true;isDrawing=false;scratchCtx.clearRect(0,0,scratchCanvas.width,scratchCanvas.height);document.getElementById('scratch-percent-display').textContent="Raspado: 100%";evaluateCardResult()}
-function evaluateCardResult(){let cd=activeGameLink.cards[activeCardIndex],counts={},win=null;cd.gridSymbols.forEach(it=>{counts[it.symbol]=(counts[it.symbol]||0)+1;if(counts[it.symbol]>=3)win=it.symbol});if(cd.isWinner&&win){AudioEngine.playWinFanfare();triggerConfettiAnimation();cd.gridSymbols.forEach((it,ix)=>{if(it.symbol===win)document.getElementById(`symbol-cell-${ix}`).classList.add('winner-pulse')});setTimeout(()=>showCelebrationModal(cd.prizeValue),400)}else AudioEngine.playLoseSound();document.getElementById('next-action-wrapper').classList.remove('hidden');let n=document.getElementById('btn-next-card');if(activeCardIndex+1<activeGameLink.totalCards)n.textContent="Ir a Siguiente Raspadita ➡️";else{n.textContent="Finalizar y Ver Resultado 🏁";n.className="w-full bg-amber-500 text-slate-950 font-extrabold py-3 rounded-xl"}}
-function showCelebrationModal(a){let o=document.createElement('div');o.id="celebration-overlay";o.className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50";o.innerHTML=`<div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-8 rounded-2xl border-2 border-amber-400 max-w-sm w-full text-center"><div class="text-6xl mb-3 animate-bounce">🏆</div><h3 class="text-3xl font-extrabold text-amber-400 gold-text uppercase">¡Felicidades!</h3><p class="text-white text-lg font-semibold mt-2">¡GANASTE $${a}!</p><button onclick="closeCelebrationModal()" class="mt-6 w-full bg-amber-500 text-slate-950 font-extrabold py-2.5 rounded-lg">Continuar</button></div>`;document.body.appendChild(o)}
+function evaluateCardResult(){
+  let cd=activeGameLink.cards[activeCardIndex],counts={},win=null;
+  cd.gridSymbols.forEach(it=>{counts[it.symbol]=(counts[it.symbol]||0)+1;if(counts[it.symbol]>=3)win=it.symbol});
+  if(cd.isWinner&&win){
+    AudioEngine.playWinFanfare();triggerConfettiAnimation();
+    cd.gridSymbols.forEach((it,ix)=>{if(it.symbol===win)document.getElementById(`symbol-cell-${ix}`).classList.add('winner-pulse')});
+    setTimeout(()=>showCelebrationModal(cd.prizeValue),400)
+  } else {
+    // NUEVO JOSE: Si no gana, salta ventana Sin Premio
+    AudioEngine.playLoseSound();
+    setTimeout(()=>showLoseModal(),400);
+  }
+  document.getElementById('next-action-wrapper').classList.remove('hidden');
+  let n=document.getElementById('btn-next-card');
+  if(activeCardIndex+1<activeGameLink.totalCards)n.textContent="Ir a Siguiente Raspadita ➡️";
+  else{n.textContent="Finalizar y Ver Resultado 🏁";n.className="w-full bg-amber-500 text-slate-950 font-extrabold py-3 rounded-xl"}
+}
+function showCelebrationModal(a){let o=document.createElement('div');o.id="celebration-overlay";o.className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50";o.innerHTML=`<div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-8 rounded-2xl border-2 border-amber-400 max-w-sm w-full text-center"><div class="text-6xl mb-3 animate-bounce">🏆</div><h3 class="text-3xl font-extrabold text-amber-400 gold-text uppercase">¡Felicidades!</h3><p class="text-white text-lg font-semibold mt-2">¡GANASTE ${a} Gs!</p><button onclick="closeCelebrationModal()" class="mt-6 w-full bg-amber-500 text-slate-950 font-extrabold py-2.5 rounded-lg">Continuar</button></div>`;document.body.appendChild(o)}
+function showLoseModal(){let o=document.createElement('div');o.id="celebration-overlay";o.className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50";o.innerHTML=`<div class="bg-slate-900 p-8 rounded-2xl border-2 border-slate-700 max-w-sm w-full text-center"><div class="text-6xl mb-3">🍀</div><h3 class="text-3xl font-extrabold text-white uppercase">Sin Premio</h3><p class="text-slate-300 text-sm mt-2">Sigue intentando, ¡tu suerte puede cambiar en la siguiente raspadita!</p><button onclick="closeCelebrationModal()" class="mt-6 w-full bg-purple-600 text-white font-extrabold py-2.5 rounded-lg">Continuar</button></div>`;document.body.appendChild(o)}
 function closeCelebrationModal(){let m=document.getElementById('celebration-overlay');if(m)m.remove()}
 function advanceNextCardOrFinish(){
   closeCelebrationModal(); activeCardIndex++;
   if(activeCardIndex<activeGameLink.totalCards) showSelectionScreen();
   else {
-    // NUEVO: Al terminar, guardamos el resultado final para siempre
     let won = activeGameLink.withPrize;
     let prize = activeGameLink.prizeAmount;
     saveFinished(activeGameLink.id, {won:won, prize:prize, at: new Date().toLocaleString()});
-    // También intentamos marcar en tu panel si estás en el mismo celu
     let links=DB.getLinks();
     if(links[activeGameLink.id]){ links[activeGameLink.id].status='usado'; DB.saveLinks(links); }
     showFinishedScreen(activeGameLink.id, won, prize);
@@ -230,4 +238,4 @@ function advanceNextCardOrFinish(){
 function triggerConfettiAnimation(){let c=document.getElementById('confetti-canvas');c.classList.remove('hidden');let ctx=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;let parts=[],cols=['#fbbf24','#f59e0b','#8b5cf6','#ec4899','#3b82f6'];for(let i=0;i<120;i++)parts.push({x:Math.random()*c.width,y:Math.random()*c.height-c.height,r:Math.random()*6+4,d:Math.random()*c.height,color:cols[Math.floor(Math.random()*cols.length)],tilt:0,tiltAngle:0,inc:Math.random()*.07+.02});function draw(){ctx.clearRect(0,0,c.width,c.height);parts.forEach((p,ix)=>{p.tiltAngle+=p.inc;p.y+=(Math.cos(p.d)+3+p.r/2)/2;p.x+=Math.sin(p.tiltAngle);p.tilt=Math.sin(p.tiltAngle-ix/3)*15;ctx.beginPath();ctx.lineWidth=p.r;ctx.strokeStyle=p.color;ctx.moveTo(p.x+p.tilt+p.r/2,p.y);ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r/2);ctx.stroke()});parts=parts.filter(p=>p.y<=c.height);if(parts.length>0&&isScratchingFinished)requestAnimationFrame(draw);else c.classList.add('hidden')}draw()}
 </script>
 </body>
-    </html>
+</html>
