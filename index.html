@@ -1,976 +1,233 @@
-# Plataforma de Raspaditas Online - Corrección de Copiado
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma de Raspaditas Online</title>
-    <!-- Tailwind CSS para un diseño moderno y responsivo -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #0f0c1b;
-            color: #f3f4f6;
-        }
-        .casino-gradient {
-            background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%);
-        }
-        .gold-border {
-
-            border: 2px solid #fbbf24;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
-        }
-        .gold-text {
-            color: #fbbf24;
-            text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
-        }
-        .scratch-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .scratch-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
-        }
-        /* Animación de brillo para cartones no seleccionados */
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        .shimmer-bg {
-            background: linear-gradient(90deg, #2d264d 25%, #4c3e7a 50%, #2d264d 75%);
-            background-size: 200% 100%;
-            animation: shimmer 2.5s infinite linear;
-        }
-        /* Animación para símbolos ganadores */
-        @keyframes pulse-gold {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 10px #fbbf24; }
-            50% { transform: scale(1.15); box-shadow: 0 0 25px #fbbf24, 0 0 40px #f59e0b; }
-        }
-        .winner-pulse {
-            animation: pulse-gold 1s infinite;
-            border: 3px solid #fbbf24 !important;
-            background-color: rgba(251, 191, 36, 0.2) !important;
-            z-index: 10;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plataforma de Raspaditas Online</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
+.gold-text{color:#fbbf24;text-shadow:0 0 10px rgba(251,191,36,0.4)}
+.scratch-card{transition:transform .2s,box-shadow .2s}
+.scratch-card:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(139,92,246,.3)}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.shimmer-bg{background:linear-gradient(90deg,#2d264d 25%,#4c3e7a 50%,#2d264d 75%);background-size:200% 100%;animation:shimmer 2.5s infinite linear}
+@keyframes pulse-gold{0%,100%{transform:scale(1);box-shadow:0 0 10px #fbbf24}50%{transform:scale(1.15);box-shadow:0 0 25px #fbbf24,0 0 40px #f59e0b}}
+.winner-pulse{animation:pulse-gold 1s infinite;border:3px solid #fbbf24!important;background-color:rgba(251,191,36,.2)!important;z-index:10}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
-
-
-    <!-- CONTENEDOR PRINCIPAL DINÁMICO -->
-    <main class="flex-grow flex items-center justify-center p-4 w-full max-w-6xl mx-auto">
-        
-        <!-- VISTA 1: PANEL DE ADMINISTRACIÓN (GENERADOR) -->
-        <div id="admin-view" class="w-full bg-slate-900/80 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-slate-800 shadow-2xl hidden">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 mb-6 gap-4">
-                <div>
-                    <h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
-                        🎰 <span class="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-purple-400">Panel de Control de Raspaditas</span>
-                    </h1>
-                    <p class="text-slate-400 text-sm mt-1">Genera y administra los accesos únicos para los jugadores.</p>
-                </div>
-                <!-- Indicador de seguridad -->
-                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5">
-                    <span class="w-2 height-2 rounded-full bg-emerald-400 animate-ping"></span> Entorno Protegido
-                </span>
-            </div>
-
-            <!-- Dashboard de Contadores -->
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/60">
-                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Enlaces Con Premio</p>
-                    <p id="stat-with-prize" class="text-3xl font-bold text-amber-400 mt-1">0</p>
-                </div>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/60">
-                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Enlaces Sin Premio</p>
-                    <p id="stat-without-prize" class="text-3xl font-bold text-purple-400 mt-1">0</p>
-                </div>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/60">
-                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Generados</p>
-                    <p id="stat-total" class="text-3xl font-bold text-white mt-1">0</p>
-                </div>
-            </div>
-
-            <!-- Formulario de Configuración -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="bg-slate-950/50 p-5 rounded-xl border border-slate-800/80 h-fit">
-                    <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">🛠️ Configurar Enlace</h2>
-
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Enlace</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button type="button" id="btn-type-prize" onclick="setPrizeType(true)" class="py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-amber-500/20 border-amber-500 text-amber-300 shadow-lg shadow-amber-500/10">
-                                    🎁 Con Premio
-                                </button>
-                                <button type="button" id="btn-type-noprize" onclick="setPrizeType(false)" class="py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-slate-900 border-slate-700 text-slate-400">
-                                    ❌ Sin Premio
-                                </button>
-                            </div>
-                        </div>
-
-                        <div id="wrapper-prize-amount">
-                            <label for="prize-amount" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Monto del Premio (\$)</label>
-                            <select id="prize-amount" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white font-bold focus:outline-none focus:border-amber-500 cursor-pointer">
-                                <option value="5.000">5.000</option>
-                                <option value="10.000" selected>10.000</option>
-
-                                <option value="20.000">20.000</option>
-                                <option value="50.000">50.000</option>
-                                <option value="100.000">100.000</option>
-                                <option value="500.000">500.000</option>
-                                <option value="1.000.000">1.000.000</option>
-                                <option value="3.000.000">3.000.000</option>
-                                <option value="5.000.000">5.000.000</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="card-quantity" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Cantidad de Raspaditas (Max 10)</label>
-                            <div class="flex items-center gap-3">
-                                <input type="range" id="card-quantity" min="1" max="10" value="1" oninput="updateQtyLabel(this.value)" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500">
-                                <span id="qty-label" class="bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 px-3 py-1 rounded-md text-sm min-w-[36px] text-center">1</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500 mt-1">El jugador raspará esta cantidad de cartones secuencialmente.</p>
-                        </div>
-
-
-                        <button onclick="generateScratchLink()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-indigo-600/20 active:scale-[0.99] mt-2">
-                            🚀 Crear Enlace Único
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Historial y Listado de Enlaces -->
-                <div class="lg:col-span-2 flex flex-col">
-                    <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">🔗 Enlaces Activos Creados</h2>
-                    <div class="flex-grow overflow-x-auto bg-slate-950/30 border border-slate-800/80 rounded-xl max-h-[380px] overflow-y-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
-                                    <th class="p-3">ID / Configuración</th>
-                                    <th class="p-3">Destino / Enlace (Click para seleccionar)</th>
-                                    <th class="p-3 text-center">Estado</th>
-                                    <th class="p-3 text-right">Acción</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="links-table-body" class="text-xs divide-y divide-slate-800/60">
-                                <!-- Enlaces insertados por JS -->
-                            </tbody>
-                        </table>
-                        <div id="no-links-msg" class="text-center py-12 text-slate-500 hidden">
-                            No has generado ningún enlace todavía. Configura uno a la izquierda.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA 2: PANTALLA DE ERROR (ENLACE EXPIRADO O USADO) -->
-        <div id="error-view" class="w-full max-w-md bg-slate-900/90 border border-red-500/30 rounded-2xl p-8 text-center shadow-2xl hidden">
-            <div class="w-16 h-16 bg-red-500/10 text-red-400 border border-red-500/20 rounded-full flex items-center justify-center mx-auto text-3xl mb-4">
-                ⚠️
-            </div>
-            <h2 class="text-2xl font-bold text-white mb-2">Enlace no válido</h2>
-            <p id="error-message-text" class="text-slate-400 text-sm leading-relaxed">
-
-                Este token de juego ya fue utilizado previamente o no existe en el sistema. Los enlaces son de un único uso.
-            </p>
-        </div>
-
-        <!-- VISTA 3: JUEGO - PASO 1: SELECCIÓN DE CARTÓN -->
-        <div id="player-select-view" class="w-full max-w-2xl bg-slate-900/80 backdrop-blur-md rounded-2xl p-6 border border-slate-800 shadow-2xl text-center hidden">
-            <div class="mb-6">
-                <span id="player-badge-qty" class="bg-purple-500/20 text-purple-300 text-xs font-bold px-3 py-1 rounded-full border border-purple-500/30">
-                    Cargando raspaditas...
-                </span>
-                <h2 class="text-2xl md:text-3xl font-extrabold text-white mt-3">¡Elige tu Cartón de la Suerte!</h2>
-                <p class="text-slate-400 text-sm mt-1">Selecciona uno de los 9 cartones disponibles para empezar a raspar.</p>
-            </div>
-
-            <!-- Grilla 3x3 de cartones para elegir -->
-            <div class="grid grid-cols-3 gap-3 max-w-md mx-auto aspect-square mb-6">
-                <button onclick="selectCarton(0)" id="carton-0" class="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-400 text-lg font-bold scratch-card">🦊<span class="text-xs block mt-1 opacity-60">#1</span></button>
-                <button onclick="selectCarton(1)" id="carton-1" class="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-400 text-lg font-bold scratch-card">🦁<span class="text-xs block mt-1 opacity-60">#2</span></button>
-                <button onclick="selectCarton(2)" id="carton-2" class="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-400 text-lg font-bold scratch-card">🐼<span class="text-xs block mt-1 opacity-60">#3</span></button>
-
-                <button onclick="selectCarton(3)" id="carton-3" class="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-400 text-lg font-bold scratch-card">🦊<span class="text-xs block mt-1 opacity-60">#4</span></button>
-                <button onclick="selectCarton(4)" id="carton-4" class="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-400 text-lg font-bold scratch-card">🦁<span class="text-xs block mt-1 opacity-60">#5</span></button>
-                <button onclick="selectCarton(5)" id="carton-5" class="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-400 text-lg font-bold scratch-card">🐼<span class="text-xs block mt-1 opacity-60">#6</span></button>
-                <button onclick="selectCarton(6)" id="carton-6" class="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-400 text-lg font-bold scratch-card">🦊<span class="text-xs block mt-1 opacity-60">#7</span></button>
-                <button onclick="selectCarton(7)" id="carton-7" class="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-400 text-lg font-bold scratch-card">🦁<span class="text-xs block mt-1 opacity-60">#8</span></button>
-                <button onclick="selectCarton(8)" id="carton-8" class="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-400 text-lg font-bold scratch-card">🐼<span class="text-xs block mt-1 opacity-60">#9</span></button>
-            </div>
-
-            <button id="btn-confirm-select" disabled onclick="goToScratchPhase()" class="w-full max-w-xs bg-slate-800 text-slate-500 font-bold py-3 rounded-xl transition cursor-not-allowed">
-                Selecciona un cartón
-            </button>
-        </div>
-
-        <!-- VISTA 4: JUEGO - PASO 2: PANTALLA DE RASPADO -->
-        <div id="player-scratch-view" class="w-full max-w-md bg-slate-900/90 backdrop-blur-md rounded-2xl p-6 border border-slate-800 shadow-2xl text-center hidden relative overflow-hidden">
-            
-            <div class="flex justify-between items-center mb-4 text-xs font-semibold text-slate-400">
-                <span id="scratch-current-status">Raspadita 1 de 1</span>
-                <span id="scratch-percent-display" class="bg-slate-800 px-2.5 py-1 rounded-md text-purple-400">Raspado: 0%</span>
-
-            </div>
-
-            <!-- Area de Juego Relativa -->
-            <div class="relative w-full aspect-square bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 touch-none">
-                
-                <!-- Capa Inferior: Los Símbolos Reales Ocultos (Grilla 3x3 con Montos) -->
-                <div id="symbols-grid" class="absolute inset-0 grid grid-cols-3 grid-rows-3 p-3 gap-2">
-                    <!-- 9 ítems insertados dinámicamente con JS -->
-                </div>
-
-                <!-- Capa Superior: Canvas de raspado interactivo -->
-                <canvas id="scratch-canvas" class="absolute inset-0 w-full h-full cursor-crosshair z-20"></canvas>
-            </div>
-
-            <p class="text-xs text-slate-400 mt-4 animate-pulse">
-                Usa el mouse o tu dedo sobre la tarjeta dorada para raspar. Al llegar al 50% se revelará por completo.
-            </p>
-
-            <div id="next-action-wrapper" class="mt-5 hidden">
-
-                <button id="btn-next-card" onclick="advanceNextCardOrFinish()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 rounded-xl shadow-lg transition">
-                    Siguiente
-                </button>
-            </div>
-        </div>
-
-        <!-- VISTA 5: PANTALLA DE BLOQUEO PERMANENTE (FIN DEL JUEGO) -->
-        <div id="blocked-view" class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-2xl p-8 text-center shadow-2xl hidden">
-            <div class="w-16 h-16 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full flex items-center justify-center mx-auto text-3xl mb-4">
-                🔒
-            </div>
-            <h2 class="text-2xl font-bold text-white mb-2">Enlace Bloqueado</h2>
-            <p class="text-slate-400 text-sm leading-relaxed">
-                Has completado todas las raspaditas asignadas a este enlace único. La sesión ha sido cerrada y el acceso se encuentra permanentemente marcado como <span class="text-red-400 font-bold uppercase">jugado</span>.
-            </p>
-        </div>
-
-    </main>
-
-
-    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none w-full h-full z-50 hidden"></canvas>
-
-    <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900/60 bg-slate-950/40">
-        Plataforma Segura de Raspaditas Virtuales &copy; 2026
-    </footer>
-
-    <!-- LOGICA SCRIPT DEL SISTEMA -->
-    <script>
-        // --- MOTOR DE AUDIO PROCEDURAL (WEB AUDIO API) ---
-        const AudioEngine = {
-            ctx: null,
-            init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-            },
-            playScratch() {
-                this.init();
-                const bufferSize = this.ctx.sampleRate * 0.05;
-
-                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-                const noise = this.ctx.createBufferSource();
-                noise.buffer = buffer;
-                
-                const filter = this.ctx.createBiquadFilter();
-                filter.type = 'bandpass';
-                filter.frequency.value = 1000;
-                
-                const gain = this.ctx.createGain();
-                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
-                
-                noise.connect(filter);
-                filter.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                noise.start();
-            },
-            playSelect() {
-                this.init();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.1);
-            },
-            playWinFanfare() {
-                this.init();
-                const now = this.ctx.currentTime;
-
-                const notes = [523.25, 659.25, 783.99, 1046.50];
-                notes.forEach((freq, index) => {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(freq, now + (index * 0.1));
-                    gain.gain.setValueAtTime(0.12, now + (index * 0.1));
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + (index * 0.1) + 0.4);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start(now + (index * 0.1));
-                    osc.stop(now + (index * 0.1) + 0.4);
-                });
-            },
-            playLoseSound() {
-                this.init();
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(220, now);
-                osc.frequency.linearRampToValueAtTime(110, now + 0.4);
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(now + 0.4);
-            }
-        };
-
-        // --- LOCALSTORAGE PERSISTENCIA SIMULADA ---
-        const DB = {
-            getLinks() {
-                const links = localStorage.getItem('scratch_links');
-                return links ? JSON.parse(links) : {};
-            },
-            saveLinks(links) {
-
-                localStorage.setItem('scratch_links', JSON.stringify(links));
-            },
-            getStats() {
-                const stats = localStorage.getItem('scratch_stats');
-                return stats ? JSON.parse(stats) : { withPrize: 0, withoutPrize: 0 };
-            },
-            saveStats(stats) {
-                localStorage.setItem('scratch_stats', JSON.stringify(stats));
-            }
-        };
-
-        // --- VARIABLES GLOBALES DE ESTADO ---
-        let currentGenerationTypeWithPrize = true;
-        let selectedCartonIndex = null;
-        let activeGameLink = null;      
-        let activeCardIndex = 0;        
-        let isScratchingFinished = false;
-        let scratchCanvas = document.getElementById('scratch-canvas');
-        let scratchCtx = scratchCanvas ? scratchCanvas.getContext('2d') : null;
-
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
-
-        const POOL_SIMBOLOS = ['🐶', '🐱', '🦁', '🐯', '🐼', '🐻', '🦊', '🐰', '🐵'];
-        const POOL_MONTOS = ['5.000', '10.000', '20.000', '50.000', '100.000', '500.000', '1.000.000', '3.000.000', '5.000.000'];
-
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const cardToken = urlParams.get('card');
-
-            if (cardToken) {
-                loadPlayerView(cardToken);
-            } else {
-                loadAdminView();
-            }
-        };
-
-        function loadAdminView() {
-
-            document.getElementById('admin-view').classList.remove('hidden');
-            updateAdminStatsDisplay();
-            renderLinksTable();
-        }
-
-        function setPrizeType(hasPrize) {
-            currentGenerationTypeWithPrize = hasPrize;
-            const btnPrize = document.getElementById('btn-type-prize');
-            const btnNoPrize = document.getElementById('btn-type-noprize');
-            const wrapperAmount = document.getElementById('wrapper-prize-amount');
-
-            if (hasPrize) {
-                btnPrize.className = "py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-amber-500/20 border-amber-500 text-amber-300 shadow-lg shadow-amber-500/10";
-                btnNoPrize.className = "py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-slate-900 border-slate-700 text-slate-400";
-                wrapperAmount.classList.remove('hidden');
-            } else {
-                btnNoPrize.className = "py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-purple-500/20 border-purple-500 text-purple-300 shadow-lg shadow-purple-500/10";
-                btnPrize.className = "py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-slate-900 border-slate-700 text-slate-400";
-                wrapperAmount.classList.add('hidden');
-
-            }
-        }
-
-        function updateQtyLabel(val) {
-            document.getElementById('qty-label').textContent = val;
-        }
-
-        function updateAdminStatsDisplay() {
-            const stats = DB.getStats();
-            document.getElementById('stat-with-prize').textContent = stats.withPrize;
-            document.getElementById('stat-without-prize').textContent = stats.withoutPrize;
-            document.getElementById('stat-total').textContent = stats.withPrize + stats.withoutPrize;
-        }
-
-        function generateScratchLink() {
-            const qty = parseInt(document.getElementById('card-quantity').value) || 1;
-            const prizeAmount = document.getElementById('prize-amount').value || '10.000';
-            
-            const token = 'resp_' + Math.random().toString(36).substring(2, 11);
-
-            const setupCards = [];
-            const winningCardIndex = currentGenerationTypeWithPrize ? Math.floor(Math.random() * qty) : -1;
-
-            for (let i = 0; i < qty; i++) {
-                const isThisWinner = (i === winningCardIndex);
-                setupCards.push({
-                    isWinner: isThisWinner,
-                    prizeValue: isThisWinner ? prizeAmount : '0',
-                    gridSymbols: generateSymbolMatrix(isThisWinner, prizeAmount)
-                });
-            }
-
-            const links = DB.getLinks();
-            links[token] = {
-                token: token,
-                withPrize: currentGenerationTypeWithPrize,
-                prizeAmount: currentGenerationTypeWithPrize ? prizeAmount : '0',
-                totalCards: qty,
-                cards: setupCards,
-
-                used: false,
-                createdAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            };
-
-            DB.saveLinks(links);
-
-            const stats = DB.getStats();
-            if (currentGenerationTypeWithPrize) {
-                stats.withPrize += 1;
-            } else {
-                stats.withoutPrize += 1;
-            }
-            DB.saveStats(stats);
-
-            updateAdminStatsDisplay();
-            renderLinksTable();
-        }
-
-        function generateSymbolMatrix(shouldWin, configuredPrizeAmount) {
-
-            let matrix = [];
-            
-            if (shouldWin) {
-                const winSymbol = POOL_SIMBOLOS[Math.floor(Math.random() * POOL_SIMBOLOS.length)];
-                
-                for (let i = 0; i < 3; i++) {
-                    matrix.push({ symbol: winSymbol, amount: configuredPrizeAmount });
-                }
-                
-                let availableAnimals = POOL_SIMBOLOS.filter(s => s !== winSymbol);
-                availableAnimals.sort(() => Math.random() - 0.5);
-                
-                for (let i = 0; i < 6; i++) {
-                    let randomAnimal = availableAnimals[i % availableAnimals.length];
-                    let filteredAmounts = POOL_MONTOS.filter(a => a !== configuredPrizeAmount);
-                    let randomAmount = filteredAmounts[Math.floor(Math.random() * filteredAmounts.length)];
-                    
-                    matrix.push({ symbol: randomAnimal, amount: randomAmount });
-                }
-
-            } else {
-                let shufflePool = [...POOL_SIMBOLOS, ...POOL_SIMBOLOS].sort(() => Math.random() - 0.5);
-                let counts = {};
-                
-                for (let sym of shufflePool) {
-                    if (!counts[sym]) counts[sym] = 0;
-                    if (counts[sym] < 2 && matrix.length < 9) {
-                        let randomAmount = POOL_MONTOS[Math.floor(Math.random() * POOL_MONTOS.length)];
-                        matrix.push({ symbol: sym, amount: randomAmount });
-                        counts[sym]++;
-                    }
-                }
-                
-                while(matrix.length < 9) {
-                    let randomAnimal = POOL_SIMBOLOS[Math.floor(Math.random() * POOL_SIMBOLOS.length)];
-                    let randomAmount = POOL_MONTOS[Math.floor(Math.random() * POOL_MONTOS.length)];
-                    matrix.push({ symbol: randomAnimal, amount: randomAmount });
-                }
-            }
-
-            
-            return matrix.sort(() => Math.random() - 0.5);
-        }
-
-        function renderLinksTable() {
-            const links = DB.getLinks();
-            const tbody = document.getElementById('links-table-body');
-            const noLinksMsg = document.getElementById('no-links-msg');
-            tbody.innerHTML = '';
-
-            const keys = Object.keys(links).reverse();
-
-            if (keys.length === 0) {
-                noLinksMsg.classList.remove('hidden');
-                return;
-            } else {
-                noLinksMsg.classList.add('hidden');
-            }
-
-
-            keys.forEach(key => {
-                const linkData = links[key];
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-900/40 transition";
-
-                const gameUrl = window.location.origin + window.location.pathname + '?card=' + linkData.token;
-
-                const badgeType = linkData.withPrize 
-                    ? `<span class="text-amber-400 font-semibold bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">Premio (\$${linkData.prizeAmount})</span>`
-                    : `<span class="text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Sin Premio</span>`;
-
-                const badgeStatus = linkData.used
-                    ? `<span class="bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded-full font-bold">🚫 Usado</span>`
-                    : `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">✅ Activo</span>`;
-
-                tr.innerHTML = `
-                    <td class="p-3">
-                        <div class="font-bold text-white mb-0.5">Paquete de ${linkData.totalCards} raspadita(s)</div>
-                        <div class="text-slate-500 text-[10px]">${linkData.createdAt} | ${badgeType}</div>
-
-                    </td>
-                    <td class="p-3">
-                        <!-- Campo input de lectura con selección automática al hacer click como respaldo absoluto -->
-                        <input type="text" readonly value="${gameUrl}" onclick="this.select();" class="bg-slate-900 border border-slate-700/60 rounded px-2.5 py-1 text-purple-300 font-mono w-full max-w-[240px] text-xs focus:outline-none focus:border-purple-500 cursor-pointer" title="Click para seleccionar todo">
-                    </td>
-                    <td class="p-3 text-center">
-                        ${badgeStatus}
-                    </td>
-                    <td class="p-3 text-right">
-                        <button onclick="copyToClipboard('${gameUrl}', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-2.5 py-1.5 rounded transition whitespace-nowrap">
-                            📋 Copiar
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // --- SISTEMA DE COPIADO COMPATIBLE CON IFRAMES / SECURITY SANDBOX ---
-
-        function copyToClipboard(text, btnElement) {
-            // Crear un textarea oculto temporal
-            const el = document.createElement('textarea');
-            el.value = text;
-            el.setAttribute('readonly', '');
-            el.style.position = 'absolute';
-            el.style.left = '-9999px';
-            document.body.appendChild(el);
-            
-            // Seleccionar el texto dentro del elemento
-            el.select();
-            el.setSelectionRange(0, 99999); // Soporte extendido para iOS y móviles antiguos
-            
-            let success = false;
-            try {
-                // Ejecutar comando nativo de copiado
-                success = document.execCommand('copy');
-            } catch (err) {
-                success = false;
-
-            }
-            
-            document.body.removeChild(el);
-            
-            if (success) {
-                // Retroalimentación visual exitosa en el botón
-                const originalText = btnElement.textContent;
-                btnElement.textContent = "¡Copiado!";
-                btnElement.className = "bg-emerald-600 text-white font-semibold px-2.5 py-1.5 rounded transition whitespace-nowrap";
-                setTimeout(() => {
-                    btnElement.textContent = originalText;
-                    btnElement.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-2.5 py-1.5 rounded transition whitespace-nowrap";
-                }, 2000);
-            } else {
-                // Ventana de diálogo emergente nativa como último recurso de seguridad infalible si el portapapeles está bloqueado
-                window.prompt("Tu navegador bloqueó el copiado automático. Copia este enlace manualmente presionando Ctrl+C / Cmd+C:", text);
-            }
-        }
-
-
-        function loadPlayerView(token) {
-            const links = DB.getLinks();
-            const gameData = links[token];
-
-            if (!gameData || gameData.used) {
-                document.getElementById('error-view').classList.remove('hidden');
-                if (gameData && gameData.used) {
-                    document.getElementById('error-message-text').textContent = "Esta raspadita ya fue jugada anteriormente. El acceso único se encuentra bloqueado.";
-                }
-                return;
-            }
-
-            activeGameLink = gameData;
-            activeCardIndex = 0;
-            showSelectionScreen();
-        }
-
-        function showSelectionScreen() {
-            document.getElementById('player-scratch-view').classList.add('hidden');
-
-            document.getElementById('player-select-view').classList.remove('hidden');
-            
-            document.getElementById('player-badge-qty').textContent = `Raspadita ${activeCardIndex + 1} de ${activeGameLink.totalCards}`;
-            
-            selectedCartonIndex = null;
-            const confirmBtn = document.getElementById('btn-confirm-select');
-            confirmBtn.disabled = true;
-            confirmBtn.className = "w-full max-w-xs bg-slate-800 text-slate-500 font-bold py-3 rounded-xl transition cursor-not-allowed";
-            confirmBtn.textContent = "Selecciona un cartón";
-
-            for (let i = 0; i < 9; i++) {
-                const carton = document.getElementById(`carton-${i}`);
-                carton.className = "shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-300 text-lg font-bold scratch-card";
-            }
-        }
-
-        function selectCarton(index) {
-            AudioEngine.playSelect();
-            selectedCartonIndex = index;
-
-
-            for (let i = 0; i < 9; i++) {
-                const carton = document.getElementById(`carton-${i}`);
-                if (i === index) {
-                    carton.className = "bg-purple-900/40 rounded-xl border-2 border-amber-400 text-amber-300 text-lg font-bold scratch-card shadow-lg shadow-purple-500/20";
-                } else {
-                    carton.className = "shimmer-bg rounded-xl border-2 border-slate-800 text-slate-600 flex flex-col items-center justify-center p-2 text-lg font-bold opacity-40 transition";
-                }
-            }
-
-            const confirmBtn = document.getElementById('btn-confirm-select');
-            confirmBtn.disabled = false;
-            confirmBtn.className = "w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold py-3 rounded-xl transition shadow-lg shadow-amber-500/20 cursor-pointer active:scale-95";
-            confirmBtn.textContent = "Confirmar y Raspar Cartón";
-        }
-
-        function goToScratchPhase() {
-            if (selectedCartonIndex === null) return;
-            AudioEngine.playSelect();
-
-
-            if (activeCardIndex === 0) {
-                const links = DB.getLinks();
-                if (links[activeGameLink.token]) {
-                    links[activeGameLink.token].used = true;
-                    DB.saveLinks(links);
-                }
-            }
-
-            document.getElementById('player-select-view').classList.add('hidden');
-            document.getElementById('player-scratch-view').classList.remove('hidden');
-
-            setupScratchCardGame();
-        }
-
-        function setupScratchCardGame() {
-            isScratchingFinished = false;
-            document.getElementById('scratch-current-status').textContent = `Raspadita ${activeCardIndex + 1} de ${activeGameLink.totalCards}`;
-            document.getElementById('scratch-percent-display').textContent = "Raspado: 0%";
-            document.getElementById('next-action-wrapper').classList.add('hidden');
-
-
-            const currentCardData = activeGameLink.cards[activeCardIndex];
-
-            const symbolsGrid = document.getElementById('symbols-grid');
-            symbolsGrid.innerHTML = '';
-            
-            currentCardData.gridSymbols.forEach((item, idx) => {
-                const cell = document.createElement('div');
-                cell.id = `symbol-cell-${idx}`;
-                cell.className = "bg-slate-900 border border-slate-800/80 rounded-xl flex flex-col items-center justify-center p-1 select-none transition duration-300";
-                
-                cell.innerHTML = `
-                    <span class="text-3xl md:text-4xl drop-shadow">${item.symbol}</span>
-                    <span class="text-[10px] md:text-xs text-amber-400/90 font-bold tracking-tight mt-1">\$${item.amount}</span>
-                `;
-                symbolsGrid.appendChild(cell);
-            });
-
-            scratchCanvas.width = scratchCanvas.offsetWidth;
-            scratchCanvas.height = scratchCanvas.offsetHeight;
-
-
-            scratchCtx.globalCompositeOperation = 'source-over';
-            let grad = scratchCtx.createLinearGradient(0, 0, scratchCanvas.width, scratchCanvas.height);
-            grad.addColorStop(0, '#d97706'); 
-            grad.addColorStop(0.5, '#f59e0b'); 
-            grad.addColorStop(1, '#b45309'); 
-            scratchCtx.fillStyle = grad;
-            scratchCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-
-            scratchCtx.fillStyle = 'rgba(255, 255, 255, 0.08)';
-            for (let i = 0; i < scratchCanvas.width; i += 8) {
-                for (let j = 0; j < scratchCanvas.height; j += 8) {
-                    if ((i + j) % 16 === 0) scratchCtx.fillRect(i, j, 3, 3);
-                }
-            }
-
-            scratchCtx.font = 'bold 15px sans-serif';
-            scratchCtx.fillStyle = '#451a03';
-            scratchCtx.textAlign = 'center';
-            scratchCtx.textBaseline = 'middle';
-
-            scratchCtx.fillText('RASPA TU ANIMAL DE LA SUERTE', scratchCanvas.width / 2, scratchCanvas.height / 2);
-
-            scratchCanvas.addEventListener('mousedown', startScratching);
-            scratchCanvas.addEventListener('mousemove', scratchAction);
-            window.addEventListener('mouseup', stopScratching);
-
-            scratchCanvas.addEventListener('touchstart', startScratching, { passive: true });
-            scratchCanvas.addEventListener('touchmove', scratchAction, { passive: true });
-            window.addEventListener('touchend', stopScratching);
-        }
-
-        function startScratching(e) {
-            if (isScratchingFinished) return;
-            isDrawing = true;
-            const coords = getEventCoords(e);
-            lastX = coords.x;
-            lastY = coords.y;
-        }
-
-
-        function scratchAction(e) {
-            if (!isDrawing || isScratchingFinished) return;
-            
-            const coords = getEventCoords(e);
-            
-            scratchCtx.globalCompositeOperation = 'destination-out';
-            scratchCtx.lineWidth = 34; 
-            scratchCtx.lineCap = 'round';
-            scratchCtx.lineJoin = 'round';
-
-            scratchCtx.beginPath();
-            scratchCtx.moveTo(lastX, lastY);
-            scratchCtx.lineTo(coords.x, coords.y);
-            scratchCtx.stroke();
-
-            lastX = coords.x;
-            lastY = coords.y;
-
-            if (Math.random() < 0.35) {
-
-                AudioEngine.playScratch();
-            }
-
-            checkScratchPercentage();
-        }
-
-        function stopScratching() {
-            isDrawing = false;
-        }
-
-        function getEventCoords(e) {
-            const rect = scratchCanvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: clientX - rect.left, y: clientY - rect.top };
-        }
-
-        function checkScratchPercentage() {
-            const width = scratchCanvas.width;
-
-            const height = scratchCanvas.height;
-            const imgData = scratchCtx.getImageData(0, 0, width, height);
-            const data = imgData.data;
-            
-            let transparentPixels = 0;
-            const step = 80; 
-            let totalChecked = 0;
-
-            for (let i = 3; i < data.length; i += step) {
-                totalChecked++;
-                if (data[i] === 0) transparentPixels++;
-            }
-
-            const percent = Math.round((transparentPixels / totalChecked) * 100);
-            document.getElementById('scratch-percent-display').textContent = `Raspado: ${percent}%`;
-
-            if (percent >= 50 && !isScratchingFinished) {
-                autoRevealAll();
-            }
-
-        }
-
-        function autoRevealAll() {
-            isScratchingFinished = true;
-            isDrawing = false;
-
-            scratchCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-            document.getElementById('scratch-percent-display').textContent = "Raspado: 100%";
-
-            evaluateCardResult();
-        }
-
-        function evaluateCardResult() {
-            const cardData = activeGameLink.cards[activeCardIndex];
-            const counts = {};
-            let winningSymbol = null;
-
-            cardData.gridSymbols.forEach(item => {
-                counts[item.symbol] = (counts[item.symbol] || 0) + 1;
-
-                if (counts[item.symbol] >= 3) {
-                    winningSymbol = item.symbol;
-                }
-            });
-
-            if (cardData.isWinner && winningSymbol) {
-                AudioEngine.playWinFanfare();
-                triggerConfettiAnimation();
-                
-                cardData.gridSymbols.forEach((item, idx) => {
-                    if (item.symbol === winningSymbol) {
-                        document.getElementById(`symbol-cell-${idx}`).classList.add('winner-pulse');
-                    }
-                });
-
-                setTimeout(() => {
-                    showCelebrationModal(cardData.prizeValue);
-                }, 400);
-
-
-            } else {
-                AudioEngine.playLoseSound();
-            }
-
-            document.getElementById('next-action-wrapper').classList.remove('hidden');
-            const nextBtn = document.getElementById('btn-next-card');
-            
-            if (activeCardIndex + 1 < activeGameLink.totalCards) {
-                nextBtn.textContent = "Ir a Siguiente Raspadita ➡️";
-            } else {
-                nextBtn.textContent = "Finalizar y Cerrar Juego 🏁";
-                nextBtn.className = "w-full bg-red-950/40 text-red-400 border border-red-900/60 font-bold py-3 rounded-xl transition hover:bg-red-900/30";
-            }
-        }
-
-        function showCelebrationModal(amount) {
-            const overlay = document.createElement('div');
-            overlay.id = "celebration-overlay";
-            overlay.className = "fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50";
-
-            
-            overlay.innerHTML = `
-                <div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-8 rounded-2xl border-2 border-amber-400 max-w-sm w-full text-center shadow-2xl relative">
-                    <div class="text-6xl mb-3 animate-bounce">🏆</div>
-                    <h3 class="text-3xl font-extrabold text-amber-400 gold-text uppercase">¡Felicidades!</h3>
-                    <p class="text-white text-lg font-semibold mt-2">¡GANASTE \$${amount}!</p>
-                    <p class="text-slate-400 text-xs mt-3 leading-relaxed">¡Las 3 figuras iguales han sido resaltadas con éxito en tu cartón!</p>
-                    <button onclick="closeCelebrationModal()" class="mt-6 w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-2.5 rounded-lg transition">
-                        Continuar
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-        }
-
-        function closeCelebrationModal() {
-            const modal = document.getElementById('celebration-overlay');
-            if (modal) modal.remove();
-        }
-
-
-        function advanceNextCardOrFinish() {
-            closeCelebrationModal();
-            activeCardIndex++;
-
-            if (activeCardIndex < activeGameLink.totalCards) {
-                showSelectionScreen();
-            } else {
-                document.getElementById('player-scratch-view').classList.add('hidden');
-                document.getElementById('player-select-view').classList.add('hidden');
-                document.getElementById('blocked-view').classList.remove('hidden');
-            }
-        }
-
-        function triggerConfettiAnimation() {
-            const canvas = document.getElementById('confetti-canvas');
-            canvas.classList.remove('hidden');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-
-            let particles = [];
-            const colors = ['#fbbf24', '#f59e0b', '#8b5cf6', '#ec4899', '#3b82f6'];
-
-            for (let i = 0; i < 120; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    r: Math.random() * 6 + 4,
-                    d: Math.random() * canvas.height,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    tilt: Math.random() * 10 - 5,
-                    tiltAngleIncremental: Math.random() * 0.07 + 0.02,
-                    tiltAngle: 0
-                });
-            }
-
-            function drawConfetti() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach((p, idx) => {
-
-                    p.tiltAngle += p.tiltAngleIncremental;
-                    p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
-                    p.x += Math.sin(p.tiltAngle);
-                    p.tilt = Math.sin(p.tiltAngle - idx / 3) * 15;
-
-                    ctx.beginPath();
-                    ctx.lineWidth = p.r;
-                    ctx.strokeStyle = p.color;
-                    ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
-                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
-                    ctx.stroke();
-                });
-
-                particles = particles.filter(p => p.y <= canvas.height);
-                if (particles.length > 0 && isScratchingFinished) {
-                    requestAnimationFrame(drawConfetti);
-                } else {
-                    canvas.classList.add('hidden');
-                }
-
-            }
-            drawConfetti();
-        }
-    </script>
+<main class="flex-grow flex items-center justify-center p-4 w-full max-w-6xl mx-auto">
+
+<!-- PANEL ADMIN -->
+<div id="admin-view" class="w-full bg-slate-900/80 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-slate-800 shadow-2xl hidden">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 mb-6 gap-4">
+<div><h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">🎰 <span class="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-purple-400">Panel de Control de Raspaditas</span></h1><p class="text-slate-400 text-sm mt-1">Genera y administra los accesos únicos para los jugadores.</p></div>
+<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Control en tiempo real</span>
+</div>
+
+<!-- SOLO 2 TOTALES -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+<div class="bg-slate-950 p-5 rounded-xl border border-slate-800/60 text-center"><p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total de Cartones Generados</p><p id="stat-total" class="text-4xl font-black text-white mt-1">0</p><p class="text-[11px] text-slate-500 mt-1">Enlaces creados en total</p></div>
+<div class="bg-slate-950 p-5 rounded-xl border border-amber-500/20 text-center"><p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Premiado</p><p id="stat-total-premiado" class="text-4xl font-black text-amber-400 mt-1">$ 0</p><p id="stat-premiado-count" class="text-[11px] text-slate-400 mt-1">0 cartones con premio</p></div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="bg-slate-950/50 p-5 rounded-xl border border-slate-800/80 h-fit">
+<h2 class="text-lg font-bold text-white mb-4">🛠️ Configurar Enlace</h2>
+<div class="space-y-4">
+<div><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipo de Enlace</label>
+<div class="grid grid-cols-2 gap-2">
+<button type="button" id="btn-type-prize" onclick="setPrizeType(true)" class="py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-amber-500/20 border-amber-500 text-amber-300">🎁 Con Premio</button>
+<button type="button" id="btn-type-noprize" onclick="setPrizeType(false)" class="py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-slate-900 border-slate-700 text-slate-400">❌ Sin Premio</button>
+</div></div>
+<div id="wrapper-prize-amount"><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Monto del Premio ($)</label>
+<select id="prize-amount" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white font-bold"><option value="5.000">5.000</option><option value="10.000" selected>10.000</option><option value="20.000">20.000</option><option value="50.000">50.000</option><option value="100.000">100.000</option><option value="500.000">500.000</option><option value="1.000.000">1.000.000</option><option value="3.000.000">3.000.000</option><option value="5.000.000">5.000.000</option></select></div>
+<div><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Cantidad de Raspaditas (Max 10)</label>
+<div class="flex items-center gap-3"><input type="range" id="card-quantity" min="1" max="10" value="1" oninput="updateQtyLabel(this.value)" class="w-full accent-purple-500"><span id="qty-label" class="bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 px-3 py-1 rounded-md text-sm min-w-[36px] text-center">1</span></div>
+<p class="text-[11px] text-slate-500 mt-1">El jugador raspará esta cantidad de cartones secuencialmente.</p></div>
+<button onclick="generateScratchLink()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-lg">🚀 Crear Enlace Único</button>
+</div></div>
+
+<div class="lg:col-span-2 flex flex-col"><h2 class="text-lg font-bold text-white mb-4">🔗 Enlaces Activos Creados</h2>
+<div class="flex-grow overflow-x-auto bg-slate-950/30 border border-slate-800/80 rounded-xl max-h-[380px] overflow-y-auto">
+<table class="w-full text-left"><thead><tr class="bg-slate-950 text-slate-400 uppercase text-[10px] border-b border-slate-800"><th class="p-3">ID / Configuración</th><th class="p-3">Destino / Enlace</th><th class="p-3 text-center">Estado</th><th class="p-3 text-right">Acción</th></tr></thead>
+<tbody id="links-table-body" class="text-xs divide-y divide-slate-800/60"></tbody></table>
+<div id="no-links-msg" class="text-center py-12 text-slate-500 hidden">No has generado ningún enlace todavía.</div>
+</div></div>
+</div></div>
+
+<!-- ERROR -->
+<div id="error-view" class="w-full max-w-md bg-slate-900/90 border border-red-500/30 rounded-2xl p-8 text-center hidden"><div class="text-3xl mb-4">⚠️</div><h2 class="text-2xl font-bold text-white mb-2">Enlace no válido</h2><p id="error-message-text" class="text-slate-400 text-sm">Este token ya fue utilizado.</p></div>
+
+<!-- SELECCION -->
+<div id="player-select-view" class="w-full max-w-2xl bg-slate-900/80 rounded-2xl p-6 border border-slate-800 text-center hidden">
+<span id="player-badge-qty" class="bg-purple-500/20 text-purple-300 text-xs font-bold px-3 py-1 rounded-full border border-purple-500/30">Cargando...</span>
+<h2 class="text-2xl md:text-3xl font-extrabold text-white mt-3">¡Elige tu Cartón de la Suerte!</h2>
+<p class="text-slate-400 text-sm mt-1">Selecciona uno de los 9 cartones para empezar.</p>
+<div class="grid grid-cols-3 gap-3 max-w-md mx-auto aspect-square mb-6 mt-4">
+<button onclick="selectCarton(0)" id="carton-0" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦊<span class="text-xs block opacity-60">#1</span></button>
+<button onclick="selectCarton(1)" id="carton-1" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦁<span class="text-xs block opacity-60">#2</span></button>
+<button onclick="selectCarton(2)" id="carton-2" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🐼<span class="text-xs block opacity-60">#3</span></button>
+<button onclick="selectCarton(3)" id="carton-3" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦊<span class="text-xs block opacity-60">#4</span></button>
+<button onclick="selectCarton(4)" id="carton-4" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦁<span class="text-xs block opacity-60">#5</span></button>
+<button onclick="selectCarton(5)" id="carton-5" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🐼<span class="text-xs block opacity-60">#6</span></button>
+<button onclick="selectCarton(6)" id="carton-6" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦊<span class="text-xs block opacity-60">#7</span></button>
+<button onclick="selectCarton(7)" id="carton-7" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🦁<span class="text-xs block opacity-60">#8</span></button>
+<button onclick="selectCarton(8)" id="carton-8" class="shimmer-bg rounded-xl border-2 border-slate-700/60 scratch-card">🐼<span class="text-xs block opacity-60">#9</span></button>
+</div>
+<button id="btn-confirm-select" disabled onclick="goToScratchPhase()" class="w-full max-w-xs bg-slate-800 text-slate-500 font-bold py-3 rounded-xl">Selecciona un cartón</button>
+</div>
+
+<!-- RASPADO -->
+<div id="player-scratch-view" class="w-full max-w-md bg-slate-900/90 rounded-2xl p-6 border border-slate-800 text-center hidden">
+<div class="flex justify-between items-center mb-4 text-xs font-semibold text-slate-400"><span id="scratch-current-status">Raspadita 1 de 1</span><span id="scratch-percent-display" class="bg-slate-800 px-2.5 py-1 rounded-md text-purple-400">Raspado: 0%</span></div>
+<div class="relative w-full aspect-square bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 touch-none"><div id="symbols-grid" class="absolute inset-0 grid grid-cols-3 grid-rows-3 p-3 gap-2"></div><canvas id="scratch-canvas" class="absolute inset-0 w-full h-full cursor-crosshair z-20"></canvas></div>
+<p class="text-xs text-slate-400 mt-4 animate-pulse">Usa tu dedo para raspar. Al 50% se revela todo.</p>
+<div id="next-action-wrapper" class="mt-5 hidden"><button id="btn-next-card" onclick="advanceNextCardOrFinish()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl">Siguiente</button></div>
+</div>
+
+<!-- NUEVO: TERMINADO CON RESULTADO -->
+<div id="blocked-view" class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-2xl p-8 text-center hidden">
+<div id="finished-icon" class="text-6xl mb-4">🏆</div>
+<h2 id="finished-title" class="text-2xl font-black text-white mb-2">¡TERMINADO!</h2>
+<p id="finished-subtitle" class="text-lg font-bold text-amber-400">Ganaste Gs. 10.000</p>
+<p class="text-slate-400 text-sm mt-3">Este enlace ya fue utilizado y no se puede volver a raspar.<br>Mostrá esta pantalla a tu vendedor para reclamar tu premio.</p>
+<p id="finished-code" class="text-[11px] text-slate-500 mt-4 font-mono"></p>
+<a id="finished-wa" href="#" target="_blank" class="inline-block mt-5 bg-emerald-600 text-white font-bold py-3 px-5 rounded-xl">💬 Avisar a mi vendedor por WhatsApp</a>
+</div>
+
+</main>
+<canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none w-full h-full z-50 hidden"></canvas>
+<footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900/60">Plataforma Segura de Raspaditas Virtuales &copy; 2026</footer>
+
+<script>
+const AudioEngine={ctx:null,init(){if(!this.ctx)this.ctx=new (window.AudioContext||window.webkitAudioContext)()},playScratch(){this.init();let b=this.ctx.createBuffer(1,this.ctx.sampleRate*.05,this.ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;let n=this.ctx.createBufferSource();n.buffer=b;let f=this.ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1000;let g=this.ctx.createGain();g.gain.setValueAtTime(.08,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.01,this.ctx.currentTime+.05);n.connect(f);f.connect(g);g.connect(this.ctx.destination);n.start()},
+playSelect(){this.init();let o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='sine';o.frequency.setValueAtTime(600,this.ctx.currentTime);o.frequency.exponentialRampToValueAtTime(300,this.ctx.currentTime+.1);g.gain.setValueAtTime(.1,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.01,this.ctx.currentTime+.1);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+.1)},
+playWinFanfare(){this.init();let now=this.ctx.currentTime;[523.25,659.25,783.99,1046.5].forEach((fr,ix)=>{let o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(fr,now+ix*.1);g.gain.setValueAtTime(.12,now+ix*.1);g.gain.exponentialRampToValueAtTime(.01,now+ix*.1+.4);o.connect(g);g.connect(this.ctx.destination);o.start(now+ix*.1);o.stop(now+ix*.1+.4)})},
+playLoseSound(){this.init();let now=this.ctx.currentTime,o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(220,now);o.frequency.linearRampToValueAtTime(110,now+.4);g.gain.setValueAtTime(.15,now);g.gain.exponentialRampToValueAtTime(.01,now+.4);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(now+.4)}};
+
+const DB={getLinks(){let l=localStorage.getItem('scratch_links_v2');return l?JSON.parse(l):{}},saveLinks(l){localStorage.setItem('scratch_links_v2',JSON.stringify(l))},getStats(){let s=localStorage.getItem('scratch_stats_v2');return s?JSON.parse(s):{withPrize:0,withoutPrize:0}},saveStats(s){localStorage.setItem('scratch_stats_v2',JSON.stringify(s))}};
+
+// NUEVO: Guardamos el resultado final para mostrarlo siempre
+function getFinished(){try{return JSON.parse(localStorage.getItem('scratch_finished_v2')||'{}')}catch(e){return{}}}
+function saveFinished(id, data){let f=getFinished(); f[id]=data; localStorage.setItem('scratch_finished_v2', JSON.stringify(f));}
+function showFinishedScreen(id, won, prizeAmount){
+  document.getElementById('player-select-view').classList.add('hidden');
+  document.getElementById('player-scratch-view').classList.add('hidden');
+  document.getElementById('blocked-view').classList.remove('hidden');
+  if(won){
+    document.getElementById('finished-icon').innerText='🏆';
+    document.getElementById('finished-title').innerText='¡TERMINADO! ¡GANASTE!';
+    document.getElementById('finished-subtitle').innerText='Ganaste Gs. ' + prizeAmount;
+    document.getElementById('finished-subtitle').className='text-lg font-bold text-amber-400';
+    document.getElementById('finished-wa').innerText='💬 Reclamar mi premio de Gs. ' + prizeAmount;
+    document.getElementById('finished-wa').href='https://wa.me/?text='+encodeURIComponent('Hola! Ya raspé mi raspadita y GANÉ Gs. '+prizeAmount+' 🏆 Mi código es: '+id);
+  } else {
+    document.getElementById('finished-icon').innerText='🍀';
+    document.getElementById('finished-title').innerText='TERMINADO';
+    document.getElementById('finished-subtitle').innerText='Terminaste Sin Premio';
+    document.getElementById('finished-subtitle').className='text-lg font-bold text-slate-300';
+    document.getElementById('finished-wa').innerText='💬 Avisar a mi vendedor';
+    document.getElementById('finished-wa').href='https://wa.me/?text='+encodeURIComponent('Hola! Ya raspé mi raspadita y terminé Sin Premio. Mi código es: '+id);
+  }
+  document.getElementById('finished-code').innerText='Código: '+id;
+}
+
+let currentGenerationTypeWithPrize=true,selectedCartonIndex=null,activeGameLink=null,activeCardIndex=0,isScratchingFinished=false,scratchCanvas=document.getElementById('scratch-canvas'),scratchCtx=scratchCanvas?scratchCanvas.getContext('2d'):null,isDrawing=false,lastX=0,lastY=0;
+const POOL_SIMBOLOS=['🐶','🐱','🦁','🐯','🐼','🐻','🦊','🐰','🐵'],POOL_MONTOS=['5.000','10.000','20.000','50.000','100.000','500.000','1.000.000','3.000.000','5.000.000'];
+window.onload=function(){let p=new URLSearchParams(location.search),t=p.get('card');if(t)loadPlayerView(t);else loadAdminView()};
+function loadAdminView(){document.getElementById('admin-view').classList.remove('hidden');updateAdminStatsDisplay();renderLinksTable(); window.addEventListener('storage',()=>{renderLinksTable();updateAdminStatsDisplay()})}
+function setPrizeType(h){currentGenerationTypeWithPrize=h;let b1=document.getElementById('btn-type-prize'),b2=document.getElementById('btn-type-noprize'),w=document.getElementById('wrapper-prize-amount');if(h){b1.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-amber-500/20 border-amber-500 text-amber-300";b2.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-slate-900 border-slate-700 text-slate-400";w.classList.remove('hidden')}else{b2.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-purple-500/20 border-purple-500 text-purple-300";b1.className="py-2.5 px-4 rounded-lg font-semibold text-sm border bg-slate-900 border-slate-700 text-slate-400";w.classList.add('hidden')}}
+function updateQtyLabel(v){document.getElementById('qty-label').textContent=v}
+function updateAdminStatsDisplay(){let links=DB.getLinks(),keys=Object.keys(links),total=keys.length,totalPremiado=0,con=0;keys.forEach(k=>{let l=links[k];if(l.withPrize){con++;let m=Number(String(l.prizeAmount).replace(/\./g,''));if(!isNaN(m))totalPremiado+=m}});document.getElementById('stat-total').textContent=total;document.getElementById('stat-total-premiado').textContent="$ "+totalPremiado.toLocaleString('es-PY');document.getElementById('stat-premiado-count').textContent=con+" cartones con premio"}
+function generateScratchLink(){let qty=parseInt(document.getElementById('card-quantity').value)||1,prize=document.getElementById('prize-amount').value||'10.000',id='rc_'+Math.random().toString(36).substring(2,11),payload={id:id,w:currentGenerationTypeWithPrize,a:currentGenerationTypeWithPrize?prize:'0',q:qty},token=btoa(JSON.stringify(payload)),links=DB.getLinks();links[id]={token:token,uniqueId:id,withPrize:currentGenerationTypeWithPrize,prizeAmount:currentGenerationTypeWithPrize?prize:'0',totalCards:qty,status:'disponible',result:'',createdAt:new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})};DB.saveLinks(links);let s=DB.getStats();if(currentGenerationTypeWithPrize)s.withPrize++;else s.withoutPrize++;DB.saveStats(s);updateAdminStatsDisplay();renderLinksTable()}
+function generateSymbolMatrix(win,prize){let m=[];if(win){let ws=POOL_SIMBOLOS[Math.floor(Math.random()*POOL_SIMBOLOS.length)];for(let i=0;i<3;i++)m.push({symbol:ws,amount:prize});let av=POOL_SIMBOLOS.filter(s=>s!==ws);av.sort(()=>Math.random()-.5);for(let i=0;i<6;i++){let a=av[i%av.length],fa=POOL_MONTOS.filter(x=>x!==prize),ra=fa[Math.floor(Math.random()*fa.length)];m.push({symbol:a,amount:ra})}}else{let sp=[...POOL_SIMBOLOS,...POOL_SIMBOLOS].sort(()=>Math.random()-.5),c={};for(let s of sp){if(!c[s])c[s]=0;if(c[s]<2&&m.length<9){m.push({symbol:s,amount:POOL_MONTOS[Math.floor(Math.random()*POOL_MONTOS.length)]});c[s]++}}while(m.length<9)m.push({symbol:POOL_SIMBOLOS[Math.floor(Math.random()*POOL_SIMBOLOS.length)],amount:POOL_MONTOS[Math.floor(Math.random()*POOL_MONTOS.length)]})}return m.sort(()=>Math.random()-.5)}
+
+function renderLinksTable(){
+  let links=DB.getLinks(), finished=getFinished(), tbody=document.getElementById('links-table-body'),msg=document.getElementById('no-links-msg');tbody.innerHTML='';
+  let keys=Object.keys(links).reverse();
+  if(keys.length==0){msg.classList.remove('hidden');return}else msg.classList.add('hidden');
+  keys.forEach(k=>{
+    let d=links[k], tr=document.createElement('tr'); tr.className="hover:bg-slate-900/40";
+    let url=location.origin+location.pathname+'?card='+d.token;
+    let badge=d.withPrize?`<span class="text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">Premio ($${d.prizeAmount})</span>`:`<span class="text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Sin Premio</span>`;
+    // NUEVO ESTADO: Si ya está en finished o status usado, muestra USADO
+    let fin=finished[k];
+    let isUsed = d.status==='usado' || !!fin;
+    let estadoHtml = isUsed
+      ? (fin && fin.won ? `<span class="text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">🔴 USADO - Ganó $${fin.prize}</span>` : `<span class="text-rose-300 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded font-bold">🔴 USADO - Sin Premio</span>`)
+      : `<span class="text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded">🟢 Disponible</span>`;
+    tr.innerHTML=`<td class="p-3"><div class="font-bold text-white">Paquete de ${d.totalCards} raspadita(s)</div><div class="text-slate-500 text-[10px]">${d.createdAt} | ${badge}</div></td><td class="p-3"><input type="text" readonly value="${url}" onclick="this.select();" class="bg-slate-900 border border-slate-700/60 rounded px-2.5 py-1 text-purple-300 w-full max-w-[240px] text-xs"></td><td class="p-3 text-center">${estadoHtml}</td><td class="p-3 text-right"><button onclick="copyToClipboard('${url}',this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded">📋 Copiar</button> <button onclick="marcarUsado('${k}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded">✔️ Marcar Usado</button></td>`;
+    tbody.appendChild(tr)
+  })
+}
+function marcarUsado(id){
+  let links=DB.getLinks();
+  if(!links[id]) return;
+  let fin=getFinished()[id];
+  if(!fin){
+    // Si vos lo marcas manual, toma el resultado que configuraste
+    let won=links[id].withPrize;
+    let prize=links[id].prizeAmount;
+    saveFinished(id,{won:won, prize:prize});
+    fin={won:won, prize:prize};
+  }
+  links[id].status='usado';
+  DB.saveLinks(links);
+  renderLinksTable();
+}
+function copyToClipboard(t,b){let e=document.createElement('textarea');e.value=t;e.style.position='absolute';e.style.left='-9999px';document.body.appendChild(e);e.select();let ok=false;try{ok=document.execCommand('copy')}catch(err){}document.body.removeChild(e);if(ok){let o=b.textContent;b.textContent="¡Copiado!";setTimeout(()=>b.textContent=o,2000)}else prompt("Copia el enlace:",t)}
+
+function loadPlayerView(token){
+  let p;try{p=JSON.parse(atob(token))}catch(e){document.getElementById('error-view').classList.remove('hidden');return}
+  // NUEVO: Si ya terminó, mostrar directo el resultado, no dejar raspar
+  let fin=getFinished()[p.id];
+  if(fin){
+    showFinishedScreen(p.id, fin.won, fin.prize);
+    return;
+  }
+  let played=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}');
+  if(played[p.id]){
+    // Si empezó pero no terminó, igual lo tratamos como terminado para que no re-raspe
+    // Buscamos si era ganador por el token
+    let won = p.w;
+    let prize = p.a;
+    showFinishedScreen(p.id, won, prize);
+    return;
+  }
+  let cards=[],winIdx=p.w?Math.floor(Math.random()*p.q):-1;for(let i=0;i<p.q;i++){let isW=(i===winIdx);cards.push({isWinner:isW,prizeValue:isW?p.a:'0',gridSymbols:generateSymbolMatrix(isW,p.a)})}
+  activeGameLink={id:p.id,token:token,withPrize:p.w,prizeAmount:p.a,totalCards:p.q,cards:cards};activeCardIndex=0;showSelectionScreen()
+}
+function showSelectionScreen(){document.getElementById('player-scratch-view').classList.add('hidden');document.getElementById('player-select-view').classList.remove('hidden');document.getElementById('player-badge-qty').textContent=`Raspadita ${activeCardIndex+1} de ${activeGameLink.totalCards}`;selectedCartonIndex=null;let b=document.getElementById('btn-confirm-select');b.disabled=true;b.className="w-full max-w-xs bg-slate-800 text-slate-500 font-bold py-3 rounded-xl";b.textContent="Selecciona un cartón";for(let i=0;i<9;i++){document.getElementById(`carton-${i}`).className="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-300 text-lg font-bold scratch-card"}}
+function selectCarton(ix){AudioEngine.playSelect();selectedCartonIndex=ix;for(let i=0;i<9;i++){let c=document.getElementById(`carton-${i}`);if(i===ix)c.className="bg-purple-900/40 rounded-xl border-2 border-amber-400 text-amber-300 text-lg font-bold scratch-card";else c.className="shimmer-bg rounded-xl border-2 border-slate-800 text-slate-600 flex flex-col items-center justify-center p-2 text-lg font-bold opacity-40"}let b=document.getElementById('btn-confirm-select');b.disabled=false;b.className="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold py-3 rounded-xl";b.textContent="Confirmar y Raspar Cartón"}
+function goToScratchPhase(){if(selectedCartonIndex===null)return;AudioEngine.playSelect();if(activeCardIndex===0){let pl=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}');pl[activeGameLink.id]=true;localStorage.setItem('scratch_played_tokens',JSON.stringify(pl))}document.getElementById('player-select-view').classList.add('hidden');document.getElementById('player-scratch-view').classList.remove('hidden');setupScratchCardGame()}
+function setupScratchCardGame(){isScratchingFinished=false;document.getElementById('scratch-current-status').textContent=`Raspadita ${activeCardIndex+1} de ${activeGameLink.totalCards}`;document.getElementById('scratch-percent-display').textContent="Raspado: 0%";document.getElementById('next-action-wrapper').classList.add('hidden');let cur=activeGameLink.cards[activeCardIndex],grid=document.getElementById('symbols-grid');grid.innerHTML='';cur.gridSymbols.forEach((it,ix)=>{let c=document.createElement('div');c.id=`symbol-cell-${ix}`;c.className="bg-slate-900 border border-slate-800/80 rounded-xl flex flex-col items-center justify-center p-1";c.innerHTML=`<span class="text-3xl md:text-4xl">${it.symbol}</span><span class="text-[10px] md:text-xs text-amber-400/90 font-bold mt-1">$${it.amount}</span>`;grid.appendChild(c)});scratchCanvas.width=scratchCanvas.offsetWidth;scratchCanvas.height=scratchCanvas.offsetHeight;scratchCtx.globalCompositeOperation='source-over';let g=scratchCtx.createLinearGradient(0,0,scratchCanvas.width,scratchCanvas.height);g.addColorStop(0,'#d97706');g.addColorStop(.5,'#f59e0b');g.addColorStop(1,'#b45309');scratchCtx.fillStyle=g;scratchCtx.fillRect(0,0,scratchCanvas.width,scratchCanvas.height);scratchCtx.font='bold 15px sans-serif';scratchCtx.fillStyle='#451a03';scratchCtx.textAlign='center';scratchCtx.textBaseline='middle';scratchCtx.fillText('RASPA TU ANIMAL DE LA SUERTE',scratchCanvas.width/2,scratchCanvas.height/2);scratchCanvas.addEventListener('mousedown',startScratching);scratchCanvas.addEventListener('mousemove',scratchAction);window.addEventListener('mouseup',stopScratching);scratchCanvas.addEventListener('touchstart',startScratching,{passive:true});scratchCanvas.addEventListener('touchmove',scratchAction,{passive:true});window.addEventListener('touchend',stopScratching)}
+function startScratching(e){if(isScratchingFinished)return;isDrawing=true;let c=getEventCoords(e);lastX=c.x;lastY=c.y}
+function scratchAction(e){if(!isDrawing||isScratchingFinished)return;let c=getEventCoords(e);scratchCtx.globalCompositeOperation='destination-out';scratchCtx.lineWidth=34;scratchCtx.lineCap='round';scratchCtx.lineJoin='round';scratchCtx.beginPath();scratchCtx.moveTo(lastX,lastY);scratchCtx.lineTo(c.x,c.y);scratchCtx.stroke();lastX=c.x;lastY=c.y;if(Math.random()<.35)AudioEngine.playScratch();checkScratchPercentage()}
+function stopScratching(){isDrawing=false}
+function getEventCoords(e){let r=scratchCanvas.getBoundingClientRect(),x=e.touches?e.touches[0].clientX:e.clientX,y=e.touches?e.touches[0].clientY:e.clientY;return{x:x-r.left,y:y-r.top}}
+function checkScratchPercentage(){let w=scratchCanvas.width,h=scratchCanvas.height,d=scratchCtx.getImageData(0,0,w,h).data,trans=0,tot=0;for(let i=3;i<d.length;i+=80){tot++;if(d[i]==0)trans++}let p=Math.round(trans/tot*100);document.getElementById('scratch-percent-display').textContent=`Raspado: ${p}%`;if(p>=50&&!isScratchingFinished)autoRevealAll()}
+function autoRevealAll(){isScratchingFinished=true;isDrawing=false;scratchCtx.clearRect(0,0,scratchCanvas.width,scratchCanvas.height);document.getElementById('scratch-percent-display').textContent="Raspado: 100%";evaluateCardResult()}
+function evaluateCardResult(){let cd=activeGameLink.cards[activeCardIndex],counts={},win=null;cd.gridSymbols.forEach(it=>{counts[it.symbol]=(counts[it.symbol]||0)+1;if(counts[it.symbol]>=3)win=it.symbol});if(cd.isWinner&&win){AudioEngine.playWinFanfare();triggerConfettiAnimation();cd.gridSymbols.forEach((it,ix)=>{if(it.symbol===win)document.getElementById(`symbol-cell-${ix}`).classList.add('winner-pulse')});setTimeout(()=>showCelebrationModal(cd.prizeValue),400)}else AudioEngine.playLoseSound();document.getElementById('next-action-wrapper').classList.remove('hidden');let n=document.getElementById('btn-next-card');if(activeCardIndex+1<activeGameLink.totalCards)n.textContent="Ir a Siguiente Raspadita ➡️";else{n.textContent="Finalizar y Ver Resultado 🏁";n.className="w-full bg-amber-500 text-slate-950 font-extrabold py-3 rounded-xl"}}
+function showCelebrationModal(a){let o=document.createElement('div');o.id="celebration-overlay";o.className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50";o.innerHTML=`<div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-8 rounded-2xl border-2 border-amber-400 max-w-sm w-full text-center"><div class="text-6xl mb-3 animate-bounce">🏆</div><h3 class="text-3xl font-extrabold text-amber-400 gold-text uppercase">¡Felicidades!</h3><p class="text-white text-lg font-semibold mt-2">¡GANASTE $${a}!</p><button onclick="closeCelebrationModal()" class="mt-6 w-full bg-amber-500 text-slate-950 font-extrabold py-2.5 rounded-lg">Continuar</button></div>`;document.body.appendChild(o)}
+function closeCelebrationModal(){let m=document.getElementById('celebration-overlay');if(m)m.remove()}
+function advanceNextCardOrFinish(){
+  closeCelebrationModal(); activeCardIndex++;
+  if(activeCardIndex<activeGameLink.totalCards) showSelectionScreen();
+  else {
+    // NUEVO: Al terminar, guardamos el resultado final para siempre
+    let won = activeGameLink.withPrize;
+    let prize = activeGameLink.prizeAmount;
+    saveFinished(activeGameLink.id, {won:won, prize:prize, at: new Date().toLocaleString()});
+    // También intentamos marcar en tu panel si estás en el mismo celu
+    let links=DB.getLinks();
+    if(links[activeGameLink.id]){ links[activeGameLink.id].status='usado'; DB.saveLinks(links); }
+    showFinishedScreen(activeGameLink.id, won, prize);
+  }
+}
+function triggerConfettiAnimation(){let c=document.getElementById('confetti-canvas');c.classList.remove('hidden');let ctx=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;let parts=[],cols=['#fbbf24','#f59e0b','#8b5cf6','#ec4899','#3b82f6'];for(let i=0;i<120;i++)parts.push({x:Math.random()*c.width,y:Math.random()*c.height-c.height,r:Math.random()*6+4,d:Math.random()*c.height,color:cols[Math.floor(Math.random()*cols.length)],tilt:0,tiltAngle:0,inc:Math.random()*.07+.02});function draw(){ctx.clearRect(0,0,c.width,c.height);parts.forEach((p,ix)=>{p.tiltAngle+=p.inc;p.y+=(Math.cos(p.d)+3+p.r/2)/2;p.x+=Math.sin(p.tiltAngle);p.tilt=Math.sin(p.tiltAngle-ix/3)*15;ctx.beginPath();ctx.lineWidth=p.r;ctx.strokeStyle=p.color;ctx.moveTo(p.x+p.tilt+p.r/2,p.y);ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r/2);ctx.stroke()});parts=parts.filter(p=>p.y<=c.height);if(parts.length>0&&isScratchingFinished)requestAnimationFrame(draw);else c.classList.add('hidden')}draw()}
+</script>
 </body>
-</html>
-
-
+    </html>
