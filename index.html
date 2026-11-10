@@ -23,10 +23,25 @@ body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 <body class="min-h-screen flex flex-col justify-between">
 <main class="flex-grow flex items-center justify-center p-4 w-full max-w-6xl mx-auto">
 
+<!-- ===== LOGIN ADMIN - AGREGADO ===== -->
+<div id="login-view" class="w-full max-w-md bg-slate-900/90 rounded-2xl p-8 border border-slate-800 text-center hidden">
+<div class="text-5xl mb-3">🔐</div>
+<h2 class="text-2xl font-extrabold text-white">Acceso Panel</h2>
+<p class="text-slate-400 text-sm mt-1 mb-6">Ingresá tu usuario y contraseña para entrar.</p>
+<div class="space-y-3 text-left">
+<div><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Usuario</label><input id="login-user" type="text" autocomplete="username" placeholder="raspaditas19" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-3 text-white"></div>
+<div><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Contraseña</label><input id="login-pass" type="password" autocomplete="current-password" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-3 text-white"></div>
+</div>
+<p id="login-error" class="hidden text-rose-400 text-sm mt-3 font-semibold">Usuario o contraseña incorrectos.</p>
+<button onclick="doLogin()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl mt-5">Entrar al Panel 🚀</button>
+<label class="flex items-center gap-2 justify-center text-xs text-slate-400 mt-4 cursor-pointer"><input id="login-remember" type="checkbox" checked class="accent-purple-500"> Mantener sesión iniciada en este dispositivo</label>
+</div>
+<!-- ===== FIN LOGIN ADMIN ===== -->
+
 <div id="admin-view" class="w-full bg-slate-900/80 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-slate-800 shadow-2xl hidden">
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 mb-6 gap-4">
 <div><h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">🎰 <span class="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-purple-400">Panel de Control de Raspaditas</span></h1><p class="text-slate-400 text-sm mt-1">Genera y administra los accesos únicos para los jugadores.</p></div>
-<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Bloqueo Global Activo - Firebase</span>
+<div class="flex items-center gap-2"><span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Bloqueo Global Activo - Firebase</span><button onclick="doLogout()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-full text-xs font-semibold border border-slate-700">Cerrar sesión</button></div>
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
 <div class="bg-slate-950 p-5 rounded-xl border border-slate-800/60 text-center"><p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total de Cartones Generados</p><p id="stat-total" class="text-4xl font-black text-white mt-1">0</p><p class="text-[11px] text-slate-500 mt-1">Cartones vendidos en total</p></div>
@@ -96,15 +111,40 @@ body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900/60">Plataforma Segura de Raspaditas Virtuales &copy; 2026</footer>
 
 <script>
-// ============ FIREBASE - PEGAR ACA TUS DATOS DE FIREBASE ============
+// ============ LOGIN ADMIN - AGREGADO (SOLO ESTO ES NUEVO) ============
+const ADMIN_USER = "raspaditas19";
+const ADMIN_PASS = "190419";
+function isAdminLogged(){ return localStorage.getItem('raspadita_admin_session')==='ok'; }
+function doLogin(){
+  let u = document.getElementById('login-user').value.trim();
+  let p = document.getElementById('login-pass').value;
+  if(u===ADMIN_USER && p===ADMIN_PASS){
+    if(document.getElementById('login-remember').checked){ localStorage.setItem('raspadita_admin_session','ok'); } else { sessionStorage.setItem('raspadita_admin_session','ok'); }
+    document.getElementById('login-error').classList.add('hidden');
+    document.getElementById('login-view').classList.add('hidden');
+    loadAdminView();
+  } else {
+    document.getElementById('login-error').classList.remove('hidden');
+  }
+}
+function doLogout(){
+  localStorage.removeItem('raspadita_admin_session');
+  sessionStorage.removeItem('raspadita_admin_session');
+  document.getElementById('admin-view').classList.add('hidden');
+  document.getElementById('login-view').classList.remove('hidden');
+  document.getElementById('login-pass').value='';
+}
+// ============ FIN LOGIN ADMIN ============
+
+// ============ FIREBASE - YA CONFIGURADO ============
 const firebaseConfig = {
-  apiKey: "PEGAR_ACA_TU_APIKEY",
-  authDomain: "PEGAR_ACA_TU_AUTHDOMAIN",
-  databaseURL: "PEGAR_ACA_TU_DATABASEURL",
-  projectId: "PEGAR_ACA_TU_PROJECTID",
-  storageBucket: "PEGAR_ACA_TU_STORAGEBUCKET",
-  messagingSenderId: "PEGAR_ACA_TU_SENDERID",
-  appId: "PEGAR_ACA_TU_APPID"
+  apiKey: "AIzaSyAxW-J1Rn70S4Bv5cVWtY5h7peSJ3Uo8V8",
+  authDomain: "raspadita-online.firebaseapp.com",
+  databaseURL: "https://raspadita-online-default-rtdb.firebaseio.com",
+  projectId: "raspadita-online",
+  storageBucket: "raspadita-online.firebasestorage.app",
+  messagingSenderId: "930757147695",
+  appId: "1:930757147695:web:d4cd3f1713f215042a9ada"
 };
 // ================================================================
 let dbFirebase = null;
@@ -141,20 +181,16 @@ function showFinishedScreen(id, won, prizeAmount){
 
 // FIREBASE: Marcar usado en la nube para TODOS los dispositivos
 function marcarUsadoEnNube(id, won, prize){
-  // Guardar local tambien por si no hay internet
   saveFinished(id, {won:won, prize:prize});
   if(dbFirebase){
     dbFirebase.ref('raspaditas_usadas/' + id).set({won:won, prize:prize, at: new Date().toISOString()});
   }
-  // Guardar en tu panel si sos vos
   let links=DB.getLinks();
   if(links[id]){ links[id].status='usado'; DB.saveLinks(links); }
 }
 function consultarNube(id, callback){
-  // 1) Revisa local rapido
   let fin = getFinished()[id];
   if(fin){ callback(fin); return; }
-  // 2) Revisa Firebase - esto es lo que bloquea en OTRO celular
   if(!dbFirebase){ callback(null); return; }
   dbFirebase.ref('raspaditas_usadas/' + id).once('value').then(snap=>{
     let v = snap.val();
@@ -165,10 +201,9 @@ function consultarNube(id, callback){
 
 let currentGenerationTypeWithPrize=true,selectedCartonIndex=null,activeGameLink=null,activeCardIndex=0,isScratchingFinished=false,scratchCanvas=document.getElementById('scratch-canvas'),scratchCtx=scratchCanvas?scratchCanvas.getContext('2d'):null,isDrawing=false,lastX=0,lastY=0;
 const POOL_SIMBOLOS=['🐶','🐱','🦁','🐯','🐼','🐻','🦊','🐰','🐵'],POOL_MONTOS=['5.000','10.000','20.000','50.000','100.000','500.000','1.000.000','3.000.000','5.000.000'];
-window.onload=function(){let p=new URLSearchParams(location.search),t=p.get('card');if(t)loadPlayerView(t);else loadAdminView()};
+window.onload=function(){let p=new URLSearchParams(location.search),t=p.get('card');if(t)loadPlayerView(t);else if(isAdminLogged() || sessionStorage.getItem('raspadita_admin_session')==='ok') loadAdminView(); else document.getElementById('login-view').classList.remove('hidden')};
 function loadAdminView(){
   document.getElementById('admin-view').classList.remove('hidden');updateAdminStatsDisplay();renderLinksTable();
-  // Escuchar cambios en Firebase para que tu panel se actualice solo cuando alguien raspa en otro celu
   if(dbFirebase){
     dbFirebase.ref('raspaditas_usadas').on('value', snap=>{
       let data = snap.val()||{};
@@ -233,7 +268,6 @@ function marcarUsado(id){
 function copyToClipboard(t,b){let e=document.createElement('textarea');e.value=t;e.style.position='absolute';e.style.left='-9999px';document.body.appendChild(e);e.select();let ok=false;try{ok=document.execCommand('copy')}catch(err){}document.body.removeChild(e);if(ok){let o=b.textContent;b.textContent="¡Copiado!";setTimeout(()=>b.textContent=o,2000)}else prompt("Copia el enlace:",t)}
 function loadPlayerView(token){
   let p;try{p=JSON.parse(atob(token))}catch(e){document.getElementById('error-view').classList.remove('hidden');return}
-  // CONSULTA EN LA NUBE ANTES DE DEJAR RASPAR - ESTO BLOQUEA EN OTRO CELULAR
   consultarNube(p.id, (fin)=>{
     if(fin){ showFinishedScreen(p.id, fin.won, fin.prize); return; }
     let played=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}');
