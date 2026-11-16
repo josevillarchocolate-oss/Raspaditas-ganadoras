@@ -5,11 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Plataforma de Raspaditas Online</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- FIREBASE PARA BLOQUEO TOTAL -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap');
 body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 .gold-text{color:#fbbf24;text-shadow:0 0 10px rgba(251,191,36,0.4)}
 .scratch-card{transition:transform .2s,box-shadow .2s}
@@ -18,18 +17,20 @@ body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 .shimmer-bg{background:linear-gradient(90deg,#2d264d 25%,#4c3e7a 50%,#2d264d 75%);background-size:200% 100%;animation:shimmer 2.5s infinite linear}
 @keyframes pulse-gold{0%,100%{transform:scale(1);box-shadow:0 0 10px #fbbf24}50%{transform:scale(1.15);box-shadow:0 0 25px #fbbf24,0 0 40px #f59e0b}}
 .winner-pulse{animation:pulse-gold 1s infinite;border:3px solid #fbbf24!important;background-color:rgba(251,191,36,.2)!important;z-index:10}
+.roulette-frame{background:radial-gradient(circle at 30% 30%, #fde68a, #b45309 45%, #7c2d12 70%, #451a03);padding:10px;border-radius:9999px;box-shadow:0 0 0 4px #fbbf24, 0 0 35px rgba(251,191,36,.6), inset 0 0 20px rgba(0,0,0,.6)}
+.roulette-center{background:radial-gradient(circle at 35% 30%, #fef3c7, #f59e0b 45%, #b45309 75%, #451a03);border:3px solid #fde68a;box-shadow:0 0 15px rgba(251,191,36,.8), inset 0 0 10px rgba(0,0,0,.5)}
+.wheel-pointer{width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid #fde68a;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))}
+.wheel-pointer::after{content:'';position:absolute;top:-28px;left:-5px;width:10px;height:10px;background:#451a03;border-radius:9999px}
 </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 <main class="flex-grow flex items-center justify-center p-4 w-full max-w-6xl mx-auto">
 
-<!-- ===== LOGIN ADMIN ===== -->
 <div id="login-view" class="w-full max-w-md bg-slate-900/90 rounded-2xl p-8 border border-slate-800 text-center hidden">
 <div class="text-5xl mb-3">🔐</div>
 <h2 class="text-2xl font-extrabold text-white">Acceso Panel</h2>
 <p class="text-slate-400 text-sm mt-1 mb-6">Ingresá tu usuario y contraseña para entrar.</p>
 <form id="login-form" autocomplete="off" onsubmit="event.preventDefault();doLogin();">
-<!-- campos trampa para que Chrome no autocomplete -->
 <input type="text" name="fake-user" autocomplete="username" style="position:absolute;opacity:0;height:0;width:0;pointer-events:none;" tabindex="-1" aria-hidden="true">
 <input type="password" name="fake-pass" autocomplete="current-password" style="position:absolute;opacity:0;height:0;width:0;pointer-events:none;" tabindex="-1" aria-hidden="true">
 <div class="space-y-3 text-left">
@@ -41,7 +42,6 @@ body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 <label class="flex items-center gap-2 justify-center text-xs text-slate-400 mt-4 cursor-pointer"><input id="login-remember" type="checkbox" checked class="accent-purple-500"> Mantener sesión iniciada en este dispositivo</label>
 </form>
 </div>
-<!-- ===== FIN LOGIN ADMIN ===== -->
 
 <div id="admin-view" class="w-full bg-slate-900/80 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-slate-800 shadow-2xl hidden">
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 mb-6 gap-4">
@@ -62,10 +62,10 @@ body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 <button type="button" id="btn-type-noprize" onclick="setPrizeType(false)" class="py-2.5 px-4 rounded-lg font-semibold text-sm transition border bg-slate-900 border-slate-700 text-slate-400">❌ Sin Premio</button>
 </div></div>
 <div id="wrapper-prize-amount"><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Monto del Premio</label>
-<select id="prize-amount" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white font-bold"><option value="5.000">5.000 Gs</option><option value="10.000" selected>10.000 Gs</option><option value="20.000">20.000 Gs</option><option value="50.000">50.000 Gs</option><option value="100.000">100.000 Gs</option><option value="500.000">500.000 Gs</option><option value="1.000.000">1.000.000 Gs</option><option value="3.000.000">3.000.000 Gs</option><option value="5.000.000">5.000.000 Gs</option></select></div>
-<div><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Cantidad de Raspaditas (Max 10)</label>
+<select id="prize-amount" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white font-bold"><option value="5.000">5.000 Gs</option><option value="10.000" selected>10.000 Gs</option><option value="20.000">20.000 Gs</option><option value="30.000">30.000 Gs</option><option value="50.000">50.000 Gs</option><option value="100.000">100.000 Gs</option><option value="200.000">200.000 Gs</option><option value="300.000">300.000 Gs</option><option value="500.000">500.000 Gs</option><option value="1.000.000">1.000.000 Gs</option><option value="2.000.000">2.000.000 Gs</option><option value="3.000.000">3.000.000 Gs</option><option value="5.000.000">5.000.000 Gs</option></select></div>
+<div><label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Cantidad (Max 10) - Raspaditas o Giros de Ruleta</label>
 <div class="flex items-center gap-3"><input type="range" id="card-quantity" min="1" max="10" value="1" oninput="updateQtyLabel(this.value)" class="w-full accent-purple-500"><span id="qty-label" class="bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 px-3 py-1 rounded-md text-sm min-w-[36px] text-center">1</span></div>
-<p class="text-[11px] text-slate-500 mt-1">El jugador raspará esta cantidad de cartones secuencialmente.</p></div>
+<p class="text-[11px] text-slate-500 mt-1">Si elegís 3, el jugador tiene 3 raspaditas O 3 giros de ruleta. Vos elegís la cantidad, el jugador elige el juego.</p></div>
 <button onclick="generateScratchLink()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-lg">🚀 Crear Enlace Único</button>
 </div></div>
 <div class="lg:col-span-2 flex flex-col"><h2 class="text-lg font-bold text-white mb-4">🔗 Enlaces Activos Creados</h2>
@@ -77,6 +77,44 @@ body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 </div></div>
 
 <div id="error-view" class="w-full max-w-md bg-slate-900/90 border border-red-500/30 rounded-2xl p-8 text-center hidden"><div class="text-3xl mb-4">⚠️</div><h2 class="text-2xl font-bold text-white mb-2">Enlace no válido</h2><p id="error-message-text" class="text-slate-400 text-sm">Este token ya fue utilizado.</p></div>
+
+<!-- PANTALLA ELEGIR JUEGO - SIN MOSTRAR PREMIO -->
+<div id="player-mode-view" class="w-full max-w-md bg-slate-900/90 rounded-2xl p-6 border border-slate-800 text-center hidden">
+<span id="mode-badge" class="bg-purple-500/20 text-purple-300 text-xs font-bold px-3 py-1 rounded-full border border-purple-500/30">🍀 ¡Buena suerte!</span>
+<h2 class="text-2xl md:text-3xl font-extrabold text-white mt-3">¿Qué querés jugar hoy?</h2>
+<p class="text-slate-400 text-sm mt-1 mb-6">Elegí una opción. Solo podés jugar una vez con este enlace.</p>
+<div class="space-y-3">
+<button onclick="chooseModeRaspadita()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white rounded-2xl p-5 text-left flex items-center gap-4">
+<span class="text-5xl">🎰</span><span><span class="block font-extrabold text-lg">Raspadita</span><span id="mode-raspadita-desc" class="block text-xs text-purple-200">Raspá tus cartones de la suerte</span></span><span class="ml-auto text-2xl">➡️</span>
+</button>
+<button onclick="chooseModeRuleta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-90 text-white rounded-2xl p-5 text-left flex items-center gap-4">
+<span class="text-5xl">🎡</span><span><span class="block font-extrabold text-lg">Ruleta Millonaria</span><span id="mode-ruleta-desc" class="block text-xs text-amber-100">¡Puede cambiar tu suerte!</span></span><span class="ml-auto text-2xl">➡️</span>
+</button>
+</div>
+<p class="text-[11px] text-slate-500 mt-5">Al elegir un juego, el otro queda bloqueado. No se puede volver atrás.</p>
+</div>
+
+<div id="player-roulette-view" class="w-full max-w-md rounded-2xl p-4 text-center hidden" style="background:linear-gradient(180deg,#1a0b2e,#0f0c1b);border:2px solid #fbbf24">
+<h2 class="text-2xl font-black text-white leading-none">🎡 RULETA <span class="text-amber-400">MILLONARIA</span></h2>
+<p class="text-slate-400 text-xs mt-1">Girá y ganá hasta 5.000.000 Gs</p>
+<div class="relative w-[320px] h-[320px] mx-auto mt-5 mb-1">
+<div class="absolute -top-2 left-1/2 -translate-x-1/2 z-30"><div class="relative wheel-pointer"></div></div>
+<div class="roulette-frame w-full h-full">
+<canvas id="roulette-canvas" width="300" height="300" class="w-full h-full rounded-full"></canvas>
+</div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110px] h-[110px] roulette-center rounded-full flex flex-col items-center justify-center z-20 text-center px-2">
+<span class="text-[9px] font-black tracking-widest text-amber-900">RULETA</span>
+<span class="text-[13px] leading-[1] font-black text-white drop-shadow" style="text-shadow:0 2px 4px rgba(0,0,0,.8)">MILLONARIA</span>
+<span class="text-[8px] font-bold text-amber-100 mt-0.5">⭐ GANA HASTA ⭐</span>
+<span class="text-[10px] font-black text-yellow-200">5.000.000 Gs</span>
+</div>
+</div>
+<p id="roulette-result-text" class="text-sm font-bold text-amber-300 min-h-[20px] mt-2"></p>
+<div class="mt-2"><span id="roulette-counter" class="inline-block bg-black/70 text-white text-xs font-bold px-4 py-1.5 rounded-full border border-white/20">0 de 1 giros disponibles</span></div>
+<button id="btn-spin" onclick="spinRoulette()" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black py-3.5 rounded-xl mt-3 text-lg shadow-lg shadow-amber-500/30">🎡 ¡GIRAR RULETA!</button>
+<div id="roulette-next-wrapper" class="mt-3 hidden"><button id="btn-next-spin" onclick="nextRouletteSpin()" class="w-full bg-white text-slate-950 font-extrabold py-3 rounded-xl">Siguiente Giro ➡️</button></div>
+<div id="roulette-finish-wrapper" class="mt-3 hidden"><button onclick="finishRoulette()" class="w-full bg-amber-400 text-slate-950 font-black py-3 rounded-xl">Finalizar y Ver Resultado 🏁</button></div>
+</div>
 
 <div id="player-select-view" class="w-full max-w-2xl bg-slate-900/80 rounded-2xl p-6 border border-slate-800 text-center hidden">
 <span id="player-badge-qty" class="bg-purple-500/20 text-purple-300 text-xs font-bold px-3 py-1 rounded-full border border-purple-500/30">Cargando...</span>
@@ -116,7 +154,6 @@ body{font-family:'Poppins',sans-serif;background-color:#0f0c1b;color:#f3f4f6}
 <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900/60">Plataforma Segura de Raspaditas Virtuales &copy; 2026</footer>
 
 <script>
-// ============ LOGIN ADMIN ============
 const ADMIN_USER = "raspaditas19";
 const ADMIN_PASS = "190419";
 function isAdminLogged(){ return localStorage.getItem('raspadita_admin_session')==='ok'; }
@@ -128,9 +165,7 @@ function doLogin(){
     document.getElementById('login-error').classList.add('hidden');
     document.getElementById('login-view').classList.add('hidden');
     loadAdminView();
-  } else {
-    document.getElementById('login-error').classList.remove('hidden');
-  }
+  } else { document.getElementById('login-error').classList.remove('hidden'); }
 }
 function doLogout(){
   localStorage.removeItem('raspadita_admin_session');
@@ -140,23 +175,9 @@ function doLogout(){
   document.getElementById('login-user').value='';
   document.getElementById('login-pass').value='';
 }
-// ============ FIN LOGIN ADMIN ============
-
-// ============ FIREBASE - YA CONFIGURADO ============
-const firebaseConfig = {
-  apiKey: "AIzaSyAxW-J1Rn70S4Bv5cVWtY5h7peSJ3Uo8V8",
-  authDomain: "raspadita-online.firebaseapp.com",
-  databaseURL: "https://raspadita-online-default-rtdb.firebaseio.com",
-  projectId: "raspadita-online",
-  storageBucket: "raspadita-online.firebasestorage.app",
-  messagingSenderId: "930757147695",
-  appId: "1:930757147695:web:d4cd3f1713f215042a9ada"
-};
+const firebaseConfig = { apiKey: "AIzaSyAxW-J1Rn70S4Bv5cVWtY5h7peSJ3Uo8V8", authDomain: "raspadita-online.firebaseapp.com", databaseURL: "https://raspadita-online-default-rtdb.firebaseio.com", projectId: "raspadita-online", storageBucket: "raspadita-online.firebasestorage.app", messagingSenderId: "930757147695", appId: "1:930757147695:web:d4cd3f1713f215042a9ada" };
 let dbFirebase = null;
-try{
-  firebase.initializeApp(firebaseConfig);
-  dbFirebase = firebase.database();
-}catch(e){ console.log("Firebase no configurado aun", e); }
+try{ firebase.initializeApp(firebaseConfig); dbFirebase = firebase.database(); }catch(e){ console.log("Firebase no configurado", e); }
 
 const AudioEngine={ctx:null,init(){if(!this.ctx)this.ctx=new (window.AudioContext||window.webkitAudioContext)()},playScratch(){this.init();let b=this.ctx.createBuffer(1,this.ctx.sampleRate*.05,this.ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;let n=this.ctx.createBufferSource();n.buffer=b;let f=this.ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1000;let g=this.ctx.createGain();g.gain.setValueAtTime(.08,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.01,this.ctx.currentTime+.05);n.connect(f);f.connect(g);g.connect(this.ctx.destination);n.start()},
 playSelect(){this.init();let o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='sine';o.frequency.setValueAtTime(600,this.ctx.currentTime);o.frequency.exponentialRampToValueAtTime(300,this.ctx.currentTime+.1);g.gain.setValueAtTime(.1,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.01,this.ctx.currentTime+.1);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+.1)},
@@ -169,6 +190,8 @@ function saveFinished(id, data){let f=getFinished(); f[id]=data; localStorage.se
 function showFinishedScreen(id, won, prizeAmount){
   document.getElementById('player-select-view').classList.add('hidden');
   document.getElementById('player-scratch-view').classList.add('hidden');
+  document.getElementById('player-mode-view').classList.add('hidden');
+  document.getElementById('player-roulette-view').classList.add('hidden');
   document.getElementById('blocked-view').classList.remove('hidden');
   if(won){
     document.getElementById('finished-icon').innerText='🏆';
@@ -185,9 +208,7 @@ function showFinishedScreen(id, won, prizeAmount){
 }
 function marcarUsadoEnNube(id, won, prize){
   saveFinished(id, {won:won, prize:prize});
-  if(dbFirebase){
-    dbFirebase.ref('raspaditas_usadas/' + id).set({won:won, prize:prize, at: new Date().toISOString()});
-  }
+  if(dbFirebase){ dbFirebase.ref('raspaditas_usadas/' + id).set({won:won, prize:prize, at: new Date().toISOString()}); }
   let links=DB.getLinks();
   if(links[id]){ links[id].status='usado'; DB.saveLinks(links); }
 }
@@ -224,11 +245,7 @@ function setPrizeType(h){currentGenerationTypeWithPrize=h;let b1=document.getEle
 function updateQtyLabel(v){document.getElementById('qty-label').textContent=v}
 function updateAdminStatsDisplay(){
   let links=DB.getLinks(),keys=Object.keys(links),totalCartones=0,totalPremiado=0,con=0;
-  keys.forEach(k=>{
-    let l=links[k];
-    totalCartones += Number(l.totalCards || 1);
-    if(l.withPrize){con++;let m=Number(String(l.prizeAmount).replace(/\./g,''));if(!isNaN(m))totalPremiado+=m}
-  });
+  keys.forEach(k=>{ let l=links[k]; totalCartones += Number(l.totalCards || 1); if(l.withPrize){con++;let m=Number(String(l.prizeAmount).replace(/\./g,''));if(!isNaN(m))totalPremiado+=m} });
   document.getElementById('stat-total').textContent=totalCartones;
   document.getElementById('stat-total-premiado').textContent=totalPremiado.toLocaleString('es-PY') + " Gs";
   document.getElementById('stat-premiado-count').textContent=con+" cartones con premio"
@@ -245,29 +262,19 @@ function renderLinksTable(){
     let badge=d.withPrize?`<span class="text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">Premio (${d.prizeAmount} Gs)</span>`:`<span class="text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Sin Premio</span>`;
     let fin=finished[k];
     let isUsed = d.status==='usado' || !!fin;
-    let estadoHtml = isUsed
-      ? (fin && fin.won ? `<span class="text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">🔴 USADO - Ganó ${fin.prize} Gs</span>` : `<span class="text-rose-300 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded font-bold">🔴 USADO - Sin Premio</span>`)
-      : `<span class="text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded">🟢 Disponible</span>`;
-    tr.innerHTML=`<td class="p-3"><div class="font-bold text-white">Paquete de ${d.totalCards} raspadita(s)</div><div class="text-slate-500 text-[10px]">${d.createdAt} | ${badge}</div></td><td class="p-3"><input type="text" readonly value="${url}" onclick="this.select();" class="bg-slate-900 border border-slate-700/60 rounded px-2.5 py-1 text-purple-300 w-full max-w-[240px] text-xs"></td><td class="p-3 text-center">${estadoHtml}</td><td class="p-3 text-right"><button onclick="copyToClipboard('${url}',this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded">📋 Copiar</button> <button onclick="marcarUsado('${k}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded">✔️ Marcar Usado</button></td>`;
+    let estadoHtml = isUsed ? (fin && fin.won ? `<span class="text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">🔴 USADO - Ganó ${fin.prize} Gs</span>` : `<span class="text-rose-300 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded font-bold">🔴 USADO - Sin Premio</span>`) : `<span class="text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded">🟢 Disponible</span>`;
+    tr.innerHTML=`<td class="p-3"><div class="font-bold text-white">${d.totalCards} raspadita(s) o ${d.totalCards} giro(s) Ruleta</div><div class="text-slate-500 text-[10px]">${d.createdAt} | ${badge}</div></td><td class="p-3"><input type="text" readonly value="${url}" onclick="this.select();" class="bg-slate-900 border border-slate-700/60 rounded px-2.5 py-1 text-purple-300 w-full max-w-[240px] text-xs"></td><td class="p-3 text-center">${estadoHtml}</td><td class="p-3 text-right"><button onclick="copyToClipboard('${url}',this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded">📋 Copiar</button> <button onclick="marcarUsado('${k}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded">✔️ Marcar Usado</button></td>`;
     tbody.appendChild(tr)
   })
 }
 function marcarUsado(id){
-  let links=DB.getLinks();
-  if(!links[id]) return;
+  let links=DB.getLinks(); if(!links[id]) return;
   let fin=getFinished()[id];
-  if(!fin){
-    let won=links[id].withPrize;
-    let prize=links[id].prizeAmount;
-    marcarUsadoEnNube(id, won, prize);
-  } else {
-    marcarUsadoEnNube(id, fin.won, fin.prize);
-  }
-  links[id].status='usado';
-  DB.saveLinks(links);
-  renderLinksTable();
+  if(!fin){ marcarUsadoEnNube(id, links[id].withPrize, links[id].prizeAmount); } else { marcarUsadoEnNube(id, fin.won, fin.prize); }
+  links[id].status='usado'; DB.saveLinks(links); renderLinksTable();
 }
 function copyToClipboard(t,b){let e=document.createElement('textarea');e.value=t;e.style.position='absolute';e.style.left='-9999px';document.body.appendChild(e);e.select();let ok=false;try{ok=document.execCommand('copy')}catch(err){}document.body.removeChild(e);if(ok){let o=b.textContent;b.textContent="¡Copiado!";setTimeout(()=>b.textContent=o,2000)}else prompt("Copia el enlace:",t)}
+
 function loadPlayerView(token){
   let p;try{p=JSON.parse(atob(token))}catch(e){document.getElementById('error-view').classList.remove('hidden');return}
   consultarNube(p.id, (fin)=>{
@@ -275,12 +282,159 @@ function loadPlayerView(token){
     let played=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}');
     if(played[p.id]){ showFinishedScreen(p.id, p.w, p.a); marcarUsadoEnNube(p.id, p.w, p.a); return; }
     let cards=[],winIdx=p.w?Math.floor(Math.random()*p.q):-1;for(let i=0;i<p.q;i++){let isW=(i===winIdx);cards.push({isWinner:isW,prizeValue:isW?p.a:'0',gridSymbols:generateSymbolMatrix(isW,p.a)})}
-    activeGameLink={id:p.id,token:token,withPrize:p.w,prizeAmount:p.a,totalCards:p.q,cards:cards};activeCardIndex=0;showSelectionScreen()
+    activeGameLink={id:p.id,token:token,withPrize:p.w,prizeAmount:p.a,totalCards:p.q,cards:cards};activeCardIndex=0;
+    showModeScreen();
   });
 }
+// CORREGIDO: NO muestra premio, ni si es con premio o sin premio
+function showModeScreen(){
+  document.getElementById('player-mode-view').classList.remove('hidden');
+  document.getElementById('mode-raspadita-desc').textContent = `Raspá tus ${activeGameLink.totalCards} cartón(es) de la suerte`;
+  document.getElementById('mode-ruleta-desc').textContent = `${activeGameLink.totalCards} giro(s), ¡puede cambiar tu suerte!`;
+  // Antes acá decía "Premio en juego: 10.000 Gs" - AHORA NUNCA MUESTRA EL MONTO
+  document.getElementById('mode-badge').textContent = `🍀 ¡Buena suerte!`;
+}
+function chooseModeRaspadita(){
+  AudioEngine.playSelect();
+  let pl=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}');pl[activeGameLink.id]=true;localStorage.setItem('scratch_played_tokens',JSON.stringify(pl));
+  document.getElementById('player-mode-view').classList.add('hidden');
+  showSelectionScreen();
+}
+function chooseModeRuleta(){
+  AudioEngine.playSelect();
+  let pl=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}');pl[activeGameLink.id]=true;localStorage.setItem('scratch_played_tokens',JSON.stringify(pl));
+  document.getElementById('player-mode-view').classList.add('hidden');
+  document.getElementById('player-roulette-view').classList.remove('hidden');
+  setupRoulette();
+}
+
+let rouletteSegments=[], rouletteAngle=0, rouletteSpinning=false, rouletteResult=null;
+let rouletteTotalSpins=1, rouletteCurrentSpin=0, rouletteWinSpinIndex=-1, rouletteAlreadyWon=false;
+function buildRouletteSegments(){
+  let prize = activeGameLink.prizeAmount;
+  let allAmounts = ['5.000','10.000','20.000','30.000','50.000','100.000','200.000','300.000','500.000','1.000.000','2.000.000','3.000.000','4.000.000','5.000.000'];
+  let colors = ['#0ea5e9','#7c3aed','#059669','#db2777','#d97706','#2563eb','#9333ea','#e11d48','#0891b2','#ca8a04','#16a34a','#be185d','#0d9488','#ea580c'];
+  rouletteSegments = [];
+  allAmounts.forEach((m,i)=>{
+    let isMyPrize = activeGameLink.withPrize && m===prize;
+    rouletteSegments.push({label: m+' GS', amount:m, isPrize:isMyPrize, type: isMyPrize?'premio':'monto', color: isMyPrize?'#fbbf24':colors[i%colors.length]});
+    if(i===5 || i===11){ rouletteSegments.push({label:'ESTUVO CERCA', amount:'0', isPrize:false, type:'cerca', color:'#f43f5e'}); }
+    else { rouletteSegments.push({label:'SIN PREMIO', amount:'0', isPrize:false, type:'sin', color:'#111827'}); }
+  });
+}
+function drawRoulette(){
+  let c=document.getElementById('roulette-canvas'); if(!c) return;
+  let ctx=c.getContext('2d'), cx=150, cy=150, R=148;
+  ctx.clearRect(0,0,300,300);
+  let segAngle = (Math.PI*2)/rouletteSegments.length;
+  rouletteSegments.forEach((s,i)=>{
+    let a0 = rouletteAngle + i*segAngle, a1=a0+segAngle;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,a0,a1); ctx.closePath();
+    ctx.fillStyle=s.color; ctx.fill();
+    ctx.strokeStyle='#fbbf24'; ctx.lineWidth=1; ctx.stroke();
+    if(s.isPrize){ ctx.beginPath(); ctx.arc(cx,cy,R-2,a0,a1); ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke(); }
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(a0+segAngle/2); ctx.textAlign='right';
+    ctx.fillStyle = s.type==='sin' ? '#cbd5e1' : (s.isPrize ? '#451a03' : '#fff');
+    ctx.font = s.type==='cerca' ? 'bold 8px Poppins, sans-serif' : 'bold 9px Poppins, sans-serif';
+    ctx.fillText(s.label, R-8, 3); ctx.restore();
+  });
+  ctx.beginPath(); ctx.arc(cx,cy,R-1,0,Math.PI*2); ctx.strokeStyle='#fbbf24'; ctx.lineWidth=4; ctx.stroke();
+}
+function updateRouletteCounter(){
+  document.getElementById('roulette-counter').textContent = `${rouletteCurrentSpin} de ${rouletteTotalSpins} giros disponibles`;
+}
+function setupRoulette(){
+  buildRouletteSegments();
+  rouletteAngle=0; rouletteSpinning=false; rouletteResult=null;
+  rouletteTotalSpins = activeGameLink.totalCards;
+  rouletteCurrentSpin=0; rouletteAlreadyWon=false;
+  if(activeGameLink.withPrize){ rouletteWinSpinIndex = Math.floor(Math.random()*rouletteTotalSpins); }
+  else { rouletteWinSpinIndex = -1; }
+  document.getElementById('roulette-result-text').textContent='';
+  document.getElementById('btn-spin').disabled=false;
+  document.getElementById('btn-spin').textContent='🎡 ¡GIRAR RULETA!';
+  document.getElementById('roulette-next-wrapper').classList.add('hidden');
+  document.getElementById('roulette-finish-wrapper').classList.add('hidden');
+  updateRouletteCounter();
+  drawRoulette();
+}
+function spinRoulette(){
+  if(rouletteSpinning) return;
+  if(rouletteCurrentSpin >= rouletteTotalSpins) return;
+  rouletteSpinning=true;
+  document.getElementById('btn-spin').disabled=true; document.getElementById('btn-spin').textContent='Girando... 🎡';
+  document.getElementById('roulette-next-wrapper').classList.add('hidden');
+  document.getElementById('roulette-finish-wrapper').classList.add('hidden');
+  document.getElementById('roulette-result-text').textContent=`Giro ${rouletteCurrentSpin+1} de ${rouletteTotalSpins}... ¡suerte!`;
+  let segAngle = (Math.PI*2)/rouletteSegments.length;
+  let targetIndex;
+  let isWinningSpin = activeGameLink.withPrize && rouletteCurrentSpin===rouletteWinSpinIndex;
+  if(isWinningSpin){
+    targetIndex = rouletteSegments.findIndex(s=>s.isPrize);
+    if(targetIndex===-1) targetIndex=0;
+  } else {
+    let opts = rouletteSegments.map((s,i)=>i).filter(i=> rouletteSegments[i].type==='sin' || rouletteSegments[i].type==='cerca');
+    targetIndex = opts[Math.floor(Math.random()*opts.length)];
+  }
+  let targetCenter = targetIndex*segAngle + segAngle/2;
+  let pointerAngle = -Math.PI/2;
+  let needed = pointerAngle - targetCenter;
+  while(needed < 0) needed += Math.PI*2;
+  let finalAngle = rouletteAngle + Math.PI*2*7 + (needed - (rouletteAngle % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+  let startAngle = rouletteAngle, diff = finalAngle - startAngle, duration=5000, startTime=null;
+  function animate(ts){
+    if(!startTime) startTime=ts;
+    let t=(ts-startTime)/duration; if(t>1) t=1;
+    let ease = 1 - Math.pow(1-t, 4);
+    rouletteAngle = startAngle + diff*ease;
+    drawRoulette();
+    if(t<1){ requestAnimationFrame(animate); } else { onRouletteEnd(targetIndex, isWinningSpin); }
+  }
+  requestAnimationFrame(animate);
+}
+function onRouletteEnd(idx, isWinningSpin){
+  rouletteSpinning=false;
+  rouletteCurrentSpin++;
+  updateRouletteCounter();
+  let seg = rouletteSegments[idx];
+  rouletteResult = seg;
+  if(isWinningSpin && seg.isPrize){
+    rouletteAlreadyWon=true;
+    AudioEngine.playWinFanfare(); triggerConfettiAnimation();
+    document.getElementById('roulette-result-text').textContent='🎉 ¡CAISTE EN ' + seg.label + '! ¡GANASTE!';
+    setTimeout(()=>showCelebrationModal(activeGameLink.prizeAmount),500);
+  } else {
+    AudioEngine.playLoseSound();
+    if(seg.type==='cerca'){ document.getElementById('roulette-result-text').textContent='😱 ¡ESTUVO CERCA! Casi lo lográs'; }
+    else { document.getElementById('roulette-result-text').textContent='Cayó en: SIN PREMIO'; }
+    setTimeout(()=>showLoseModal(),500);
+  }
+  if(rouletteCurrentSpin < rouletteTotalSpins){
+    document.getElementById('roulette-next-wrapper').classList.remove('hidden');
+    document.getElementById('btn-next-spin').textContent = `Siguiente Giro ➡️ (${rouletteCurrentSpin} de ${rouletteTotalSpins} usados)`;
+  } else {
+    document.getElementById('roulette-finish-wrapper').classList.remove('hidden');
+    document.getElementById('btn-spin').textContent='Ya usaste todos tus giros';
+  }
+}
+function nextRouletteSpin(){
+  closeCelebrationModal();
+  document.getElementById('roulette-next-wrapper').classList.add('hidden');
+  document.getElementById('roulette-result-text').textContent='';
+  document.getElementById('btn-spin').disabled=false;
+  document.getElementById('btn-spin').textContent=`🎡 ¡GIRAR! Giro ${rouletteCurrentSpin+1} de ${rouletteTotalSpins}`;
+}
+function finishRoulette(){
+  closeCelebrationModal();
+  let won = activeGameLink.withPrize;
+  let prize = activeGameLink.prizeAmount;
+  marcarUsadoEnNube(activeGameLink.id, won, prize);
+  showFinishedScreen(activeGameLink.id, won, prize);
+}
+
 function showSelectionScreen(){document.getElementById('player-scratch-view').classList.add('hidden');document.getElementById('player-select-view').classList.remove('hidden');document.getElementById('player-badge-qty').textContent=`Raspadita ${activeCardIndex+1} de ${activeGameLink.totalCards}`;selectedCartonIndex=null;let b=document.getElementById('btn-confirm-select');b.disabled=true;b.className="w-full max-w-xs bg-slate-800 text-slate-500 font-bold py-3 rounded-xl";b.textContent="Selecciona un cartón";for(let i=0;i<9;i++){document.getElementById(`carton-${i}`).className="shimmer-bg rounded-xl border-2 border-slate-700/60 flex flex-col items-center justify-center p-2 text-slate-300 text-lg font-bold scratch-card"}}
 function selectCarton(ix){AudioEngine.playSelect();selectedCartonIndex=ix;for(let i=0;i<9;i++){let c=document.getElementById(`carton-${i}`);if(i===ix)c.className="bg-purple-900/40 rounded-xl border-2 border-amber-400 text-amber-300 text-lg font-bold scratch-card";else c.className="shimmer-bg rounded-xl border-2 border-slate-800 text-slate-600 flex flex-col items-center justify-center p-2 text-lg font-bold opacity-40"}let b=document.getElementById('btn-confirm-select');b.disabled=false;b.className="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold py-3 rounded-xl";b.textContent="Confirmar y Raspar Cartón"}
-function goToScratchPhase(){if(selectedCartonIndex===null)return;AudioEngine.playSelect();if(activeCardIndex===0){let pl=JSON.parse(localStorage.getItem('scratch_played_tokens')||'{}');pl[activeGameLink.id]=true;localStorage.setItem('scratch_played_tokens',JSON.stringify(pl))}document.getElementById('player-select-view').classList.add('hidden');document.getElementById('player-scratch-view').classList.remove('hidden');setupScratchCardGame()}
+function goToScratchPhase(){if(selectedCartonIndex===null)return;AudioEngine.playSelect();document.getElementById('player-select-view').classList.add('hidden');document.getElementById('player-scratch-view').classList.remove('hidden');setupScratchCardGame()}
 function setupScratchCardGame(){isScratchingFinished=false;document.getElementById('scratch-current-status').textContent=`Raspadita ${activeCardIndex+1} de ${activeGameLink.totalCards}`;document.getElementById('scratch-percent-display').textContent="Raspado: 0%";document.getElementById('next-action-wrapper').classList.add('hidden');let cur=activeGameLink.cards[activeCardIndex],grid=document.getElementById('symbols-grid');grid.innerHTML='';cur.gridSymbols.forEach((it,ix)=>{let c=document.createElement('div');c.id=`symbol-cell-${ix}`;c.className="bg-slate-900 border border-slate-800/80 rounded-xl flex flex-col items-center justify-center p-1";c.innerHTML=`<span class="text-3xl md:text-4xl">${it.symbol}</span><span class="text-[10px] md:text-xs text-amber-400/90 font-bold mt-1">${it.amount} Gs</span>`;grid.appendChild(c)});scratchCanvas.width=scratchCanvas.offsetWidth;scratchCanvas.height=scratchCanvas.offsetHeight;scratchCtx.globalCompositeOperation='source-over';let g=scratchCtx.createLinearGradient(0,0,scratchCanvas.width,scratchCanvas.height);g.addColorStop(0,'#d97706');g.addColorStop(.5,'#f59e0b');g.addColorStop(1,'#b45309');scratchCtx.fillStyle=g;scratchCtx.fillRect(0,0,scratchCanvas.width,scratchCanvas.height);scratchCtx.font='bold 15px sans-serif';scratchCtx.fillStyle='#451a03';scratchCtx.textAlign='center';scratchCtx.textBaseline='middle';scratchCtx.fillText('RASPA TU ANIMAL DE LA SUERTE',scratchCanvas.width/2,scratchCanvas.height/2);scratchCanvas.addEventListener('mousedown',startScratching);scratchCanvas.addEventListener('mousemove',scratchAction);window.addEventListener('mouseup',stopScratching);scratchCanvas.addEventListener('touchstart',startScratching,{passive:true});scratchCanvas.addEventListener('touchmove',scratchAction,{passive:true});window.addEventListener('touchend',stopScratching)}
 function startScratching(e){if(isScratchingFinished)return;isDrawing=true;let c=getEventCoords(e);lastX=c.x;lastY=c.y}
 function scratchAction(e){if(!isDrawing||isScratchingFinished)return;let c=getEventCoords(e);scratchCtx.globalCompositeOperation='destination-out';scratchCtx.lineWidth=34;scratchCtx.lineCap='round';scratchCtx.lineJoin='round';scratchCtx.beginPath();scratchCtx.moveTo(lastX,lastY);scratchCtx.lineTo(c.x,c.y);scratchCtx.stroke();lastX=c.x;lastY=c.y;if(Math.random()<.35)AudioEngine.playScratch();checkScratchPercentage()}
@@ -310,14 +464,9 @@ function closeCelebrationModal(){let m=document.getElementById('celebration-over
 function advanceNextCardOrFinish(){
   closeCelebrationModal(); activeCardIndex++;
   if(activeCardIndex<activeGameLink.totalCards) showSelectionScreen();
-  else {
-    let won = activeGameLink.withPrize;
-    let prize = activeGameLink.prizeAmount;
-    marcarUsadoEnNube(activeGameLink.id, won, prize);
-    showFinishedScreen(activeGameLink.id, won, prize);
-  }
+  else { let won = activeGameLink.withPrize; let prize = activeGameLink.prizeAmount; marcarUsadoEnNube(activeGameLink.id, won, prize); showFinishedScreen(activeGameLink.id, won, prize); }
 }
 function triggerConfettiAnimation(){let c=document.getElementById('confetti-canvas');c.classList.remove('hidden');let ctx=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;let parts=[],cols=['#fbbf24','#f59e0b','#8b5cf6','#ec4899','#3b82f6'];for(let i=0;i<120;i++)parts.push({x:Math.random()*c.width,y:Math.random()*c.height-c.height,r:Math.random()*6+4,d:Math.random()*c.height,color:cols[Math.floor(Math.random()*cols.length)],tilt:0,tiltAngle:0,inc:Math.random()*.07+.02});function draw(){ctx.clearRect(0,0,c.width,c.height);parts.forEach((p,ix)=>{p.tiltAngle+=p.inc;p.y+=(Math.cos(p.d)+3+p.r/2)/2;p.x+=Math.sin(p.tiltAngle);p.tilt=Math.sin(p.tiltAngle-ix/3)*15;ctx.beginPath();ctx.lineWidth=p.r;ctx.strokeStyle=p.color;ctx.moveTo(p.x+p.tilt+p.r/2,p.y);ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r/2);ctx.stroke()});parts=parts.filter(p=>p.y<=c.height);if(parts.length>0&&isScratchingFinished)requestAnimationFrame(draw);else c.classList.add('hidden')}draw()}
 </script>
 </body>
-  </html>
+</html>
